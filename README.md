@@ -1,10 +1,11 @@
-# E-Commerce-for-shopping-
+# E- Commerce for online shopping 
+
 
 # 🛍️ Trend Mart
 
 **Trend Mart** is a modern men's fashion e-commerce website designed to simplify online product discovery and order processing through **WhatsApp**.
 
-Customers can browse products, view complete product details, get support through an AI chat assistant, and place orders directly through WhatsApp. Orders can then be managed and tracked through a dedicated admin panel.
+Customers can browse products, view product details, get customer support through an AI chatbot, and place orders directly through WhatsApp. The store can be managed through a dedicated admin panel with product management, order management, reports, promotions, and a custom database-connected admin chat assistant.
 
 ---
 
@@ -19,54 +20,133 @@ Customers can browse products, view complete product details, get support throug
 * 📱 **Buy Now** button
 * 💬 Automatically redirect customers to WhatsApp with the order message
 * 📦 Order details sent directly to the Trend Mart WhatsApp account
-* 🤖 AI-powered customer chat support
-* 💬 Customer support through **LiveChatAI.com**
-* 🧠 AI chatbot can be customized with Trend Mart's own website information
+* 🤖 Customer-side AI chat support
 * 📢 Promotional banners
 * 🎉 Festival/event popup posters
 * 📅 Scheduled banners and popup campaigns using start and end dates
 
 ---
 
-## 🤖 AI Chat Support
+## 🤖 Customer AI Chat Support
 
-Trend Mart includes AI-powered customer support using **LiveChatAI.com**.
+Trend Mart includes a **customer-facing AI chat support bot** using **LiveChatAI.com**.
 
-The chatbot can be customized with Trend Mart's own website information so customers can get answers related to the store.
+The chatbot can be trained with Trend Mart's own website and business information.
 
-The chatbot can use Trend Mart information such as:
+### 🧠 LiveChatAI.com Training
 
+The store owner can add Trend Mart information to LiveChatAI.com so the customer chatbot can provide relevant support.
+
+Information can include:
+
+* 🏪 Trend Mart business details
 * 🛍️ Product information
-* 💰 Product pricing
-* 📦 Order information
-* 🚚 Store/order policies
+* 💰 Product details and pricing
+* 📦 Ordering information
 * 📱 WhatsApp ordering process
-* 🏪 Trend Mart business information
+* 🚚 Delivery information
+* 📋 Store policies
 * ❓ Frequently asked questions
-* 📋 Other important website details
+* 📞 Customer support information
+* 📄 Other important website information
 
-### 🗄️ Database-Based Chat Knowledge
+The information can be updated in LiveChatAI.com whenever the store's information changes.
 
-Chat support information can be managed through the **Admin Panel** and stored in the database.
+**Chat Support:** [LiveChatAI.com](https://www.livechatai.com/?utm_source=chatgpt.com)
 
-Admins can:
+> Add your own website/store details to LiveChatAI.com and train the customer-support chatbot with your information.
 
-* ➕ Add new chatbot information
-* ✏️ Edit existing chatbot information
-* 🗑️ Remove outdated information
-* 📚 Add FAQs and store information
-* 📝 Update product/store-related information used by the chatbot
-* 🔄 Keep the chatbot knowledge up to date without changing the website code
+This chatbot is used **only for customer-side support**.
 
-This allows Trend Mart to maintain its AI customer support information from the admin panel.
+---
 
-**Chat Support Provider:** LiveChatAI.com
+## 🤖 Custom Admin Database Chat
+
+Trend Mart has a **separate custom chatbot created specifically for the Admin Panel**.
+
+This chatbot is **not LiveChatAI.com** and does **not connect to LiveChatAI.com**.
+
+The custom admin bot is connected directly to the Trend Mart database and allows the admin to ask questions about store data using natural language.
+
+### 🗄️ Database-Powered Queries
+
+The admin can ask questions such as:
+
+```text
+Which orders were placed today?
+
+How many orders do we have?
+
+How many pending orders are there?
+
+Which orders are completed?
+
+What products were ordered today?
+
+Show today's orders.
+
+How many orders are pending?
+
+Which products have been ordered the most?
+```
+
+The custom bot processes the admin's question, accesses the relevant Trend Mart database information, and returns an answer based on the available data.
+
+### 🔄 Custom Admin Bot Flow
+
+```text
+Admin
+  │
+  ▼
+Ask Question
+  │
+  ▼
+Custom Admin Chat Bot
+  │
+  ▼
+Trend Mart Database
+  │
+  ▼
+Read Relevant Data
+  │
+  ▼
+Process Query
+  │
+  ▼
+Return Answer
+```
+
+### 🔒 Separate Chat Systems
+
+```text
+CUSTOMER SIDE
+     │
+     ▼
+LiveChatAI.com
+     │
+     ▼
+Customer Support
+
+
+ADMIN SIDE
+     │
+     ▼
+Custom Trend Mart Bot
+     │
+     ▼
+Trend Mart Database
+     │
+     ▼
+Store Data / Order Queries
+```
+
+The **custom admin bot does not use or connect to LiveChatAI.com**.
 
 ---
 
 ## 🔐 Admin Panel
 
-The admin panel provides complete control over the store.
+The admin panel provides centralized control over the Trend Mart store.
 
 ### 📦 Product Management
 
@@ -84,7 +164,7 @@ The admin panel provides complete control over the store.
 * 📦 View order details
 * 🔄 Change order status
 * 📊 Monitor order progress
-* 📱 Process orders received through WhatsApp
+* 📱 Manage orders received through WhatsApp
 
 ### 📊 Reports & Analytics
 
@@ -112,20 +192,20 @@ The admin panel provides complete control over the store.
 * 📅 Set end date
 * ⏰ Automatically display the popup only during the configured period
 
-### 🤖 Chat Support Management
+### 🤖 Custom Admin Chat
 
-* 💬 Manage AI chat support information
-* 🗄️ Store chatbot knowledge in the database
-* ➕ Add new chatbot knowledge
-* ✏️ Edit chatbot information
-* 🗑️ Delete outdated information
-* ❓ Manage frequently asked questions
-* 📚 Add Trend Mart business information
-* 🔄 Update information used by the AI chatbot
+* 💬 Ask questions about store data
+* 🗄️ Connect directly to the Trend Mart database
+* 📦 Query order information
+* 📊 Analyse available store data
+* 🔎 Find specific information
+* 📅 Ask date-based questions
+* 📈 Get database-based answers
+* 🤖 Use natural-language questions
 
 ---
 
-## 🔄 Order Workflow
+## 🔄 Customer Order Workflow
 
 ```text
 Customer
@@ -133,10 +213,10 @@ Customer
    ▼
 Browse Products
    │
-   ├──────────────► AI Chat Support
+   ├──────────────► LiveChatAI.com
    │                │
    │                ▼
-   │          Get Store Information
+   │          Customer Support
    │
    ▼
 View Product
@@ -194,12 +274,11 @@ Admin Login
      │     ├── Edit Poster
      │     └── Schedule Popup
      │
-     └── Chat Support
-           ├── Add Knowledge
-           ├── Edit Knowledge
-           ├── Delete Knowledge
-           ├── Manage FAQs
-           └── Update AI Information
+     └── Custom Admin Chat
+           ├── Ask Questions
+           ├── Query Orders
+           ├── Analyse Data
+           └── Get Database Answers
 ```
 
 ---
@@ -234,20 +313,19 @@ The admin panel allows Trend Mart to operate without directly modifying the webs
 
 Admins can manage:
 
-| Section          | Admin Control                     |
-| ---------------- | --------------------------------- |
-| Products         | Add, edit, delete, update         |
-| Images           | Upload/change product images      |
-| Descriptions     | Add/edit descriptions             |
-| Prices           | Update prices                     |
-| Orders           | View and manage                   |
-| Order Status     | Update processing status          |
-| Reports          | View and analyse data             |
-| Banners          | Add/edit/schedule                 |
-| Festival Posters | Add/edit/schedule                 |
-| Chat Support     | Add/edit/delete chatbot knowledge |
-| Chatbot FAQs     | Manage frequently asked questions |
-| Campaign Dates   | Start & end date                  |
+| Section           | Admin Control                |
+| ----------------- | ---------------------------- |
+| Products          | Add, edit, delete, update    |
+| Images            | Upload/change product images |
+| Descriptions      | Add/edit descriptions        |
+| Prices            | Update prices                |
+| Orders            | View and manage              |
+| Order Status      | Update processing status     |
+| Reports           | View and analyse data        |
+| Banners           | Add/edit/schedule            |
+| Festival Posters  | Add/edit/schedule            |
+| Custom Admin Chat | Query and analyse store data |
+| Campaign Dates    | Start & end date             |
 
 ---
 
@@ -272,15 +350,16 @@ The same scheduling system can be used for promotional banners.
 
 ## 🧑‍💻 Technology
 
-The project is built with web technologies and an admin management system.
+The project is built using:
 
 * HTML
 * CSS
 * JavaScript
 * Supabase
-* Database-driven content management
+* Database integration
 * WhatsApp integration
 * LiveChatAI.com
+* Custom database-connected admin chatbot
 * GitHub
 
 ---
@@ -300,23 +379,53 @@ The database can store information such as:
 * Banners
 * Festival popup campaigns
 * Campaign start/end dates
-* Chatbot knowledge
-* Chatbot FAQs
-* Store information used by AI support
 * Reports and analytics data
+
+The custom admin chatbot can access relevant database information to answer admin questions about the store.
+
+---
+
+## 🤖 Two Separate Chat Systems
+
+Trend Mart uses **two independent chat systems with completely different purposes**.
+
+| Chat System          | Location      | Purpose                                        | Connection          |
+| -------------------- | ------------- | ---------------------------------------------- | ------------------- |
+| **LiveChatAI.com**   | Customer Side | Customer support and website/store information | LiveChatAI.com      |
+| **Custom Admin Bot** | Admin Panel   | Query and analyse Trend Mart database data     | Trend Mart Database |
+
+### 1. Customer Chat — LiveChatAI.com
+
+* Customer-facing
+* Used for customer support
+* Trained with Trend Mart website/store information
+* Managed through LiveChatAI.com
+* Completely separate from the admin database bot
+
+**Website:** [LiveChatAI.com](https://www.livechatai.com/?utm_source=chatgpt.com)
+
+### 2. Admin Chat — Custom Trend Mart Bot
+
+* Admin-facing
+* Custom bot created for Trend Mart
+* Connected directly to the Trend Mart database
+* Used for natural-language database queries
+* Can answer questions about orders, products, dates, and other available store data
+* **Not connected to LiveChatAI.com**
 
 ---
 
 ## 🌟 Main Highlights
 
 * 📱 WhatsApp-based ordering
-* 🤖 AI-powered customer chat support
+* 🤖 Customer AI chat support
 * 💬 LiveChatAI.com integration
-* 🧠 Custom AI knowledge for Trend Mart
-* 🗄️ Database-based chatbot knowledge
-* 🔐 Admin management panel
-* 💬 Admin-managed chat support content
+* 🧠 Train customer chatbot with Trend Mart website/store information
+* 🤖 Custom admin database chatbot
+* 🗄️ Direct database-connected admin chat
+* 🔎 Natural-language database queries
 * 📦 Order status management
+* 🔐 Admin management panel
 * 📊 Reports and analytics
 * 🛍️ Product management
 * 🖼️ Image and description management
@@ -328,9 +437,15 @@ The database can store information such as:
 
 ---
 
+# Preview of the website : http://trendfashionclub.netlify.app/
+
 ## 🎯 Project Goal
 
-The goal of Trend Mart is to provide a simple and practical online shopping experience where customers can discover products, get AI-powered support, and place orders through WhatsApp, while the store owner can manage products, orders, promotions, chatbot information, and reports from a centralized admin panel.
+The goal of Trend Mart is to provide a practical online shopping experience where customers can discover products, get AI-powered support, and place orders through WhatsApp.
+
+At the same time, the store owner can manage products, orders, promotions, reports, and database information through a centralized admin panel with a **custom database-connected chat assistant**.
+
+The customer-side **LiveChatAI.com** chatbot and the admin-side **custom database chatbot are completely separate systems** designed for different purposes.
 
 ---
 
@@ -339,4 +454,3 @@ The goal of Trend Mart is to provide a simple and practical online shopping expe
 **🚧 Active Development**
 
 New features and improvements are continuously being added to Trend Mart.
-
