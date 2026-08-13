@@ -866,7 +866,7 @@
     </header>
     <span class="back-arrow" onclick="hideProductDetails()">←</span>
     <div class="main-container">
-        <div class="category-section">
+        <div class="category-section" id="categories">
             <h2>Top Categories</h2>
             <div class="category-container">
                 <div class="category-track">
@@ -944,8 +944,10 @@
                 <div class="similar-products-grid" id="similar-products-grid"></div>
             </div>
         </div>
-        <div class="about-section">
+        <div class="about-section" id="about-section">
             <h2>Trend Mart</h2>
+            <p>Your one-stop shop for bags, chappals, crocs, shoes, watches, dresses and more — all at great prices.</p>
+            <p>Order on WhatsApp: <a href="https://wa.me/9188384350">+91 88384 350</a></p>
         </div>
     </div>
     <div id="popup-overlay" class="popup-overlay" style="display:none;" onclick="if(event.target===this)closePopup()">
@@ -986,13 +988,13 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="https://categorie.netlify.app">
+            <a href="#categories">
                 <img src="https://img.icons8.com/ios-filled/50/333333/category.png" alt="Categories">
                 <p>Categories</p>
             </a>
         </div>
         <div class="nav-item">
-            <a href="https://tabout.netlify.app">
+            <a href="#about-section">
                 <img src="https://img.icons8.com/ios-filled/50/333333/about.png" alt="About">
                 <p>Help</p>
             </a>
