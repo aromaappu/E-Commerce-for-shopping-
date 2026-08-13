@@ -1,0 +1,180 @@
+{
+  "services": [
+    {
+      "service_name": "TrendMart_Orders",
+      "description": "Search and report on customer orders, track order status, view sales totals and delivery updates",
+      "slots": [
+        {
+          "name": "tracking_code",
+          "description": "The tracking code of an order, e.g. TM-ABCDEF",
+          "is_categorical": false,
+          "possible_values": []
+        },
+        {
+          "name": "status",
+          "description": "Order status: Order Placed, Confirmed, Packed, Shipped, Delivered",
+          "is_categorical": true,
+          "possible_values": ["Order Placed", "Confirmed", "Packed", "Shipped", "Delivered"]
+        },
+        {
+          "name": "customer_name",
+          "description": "Name of the customer who placed the order",
+          "is_categorical": false,
+          "possible_values": []
+        },
+        {
+          "name": "customer_phone",
+          "description": "Phone number of the customer who placed the order",
+          "is_categorical": false,
+          "possible_values": []
+        },
+        {
+          "name": "date_range",
+          "description": "Time period, e.g. today, yesterday, last 7 days, this week, last month",
+          "is_categorical": false,
+          "possible_values": ["today", "yesterday", "this week", "last week", "last 7 days", "last 30 days", "this month", "last month"]
+        },
+        {
+          "name": "count",
+          "description": "Number of orders or items",
+          "is_categorical": false,
+          "possible_values": []
+        },
+        {
+          "name": "product_name",
+          "description": "Name of a product in an order",
+          "is_categorical": false,
+          "possible_values": []
+        }
+      ],
+      "intents": [
+        {
+          "name": "GetOrderCount",
+          "description": "Count how many orders were placed in a given time period",
+          "is_transactional": false,
+          "required_slots": ["date_range"],
+          "optional_slots": {},
+          "result_slots": ["count"]
+        },
+        {
+          "name": "GetOrderByCode",
+          "description": "Look up a single order using its tracking code",
+          "is_transactional": false,
+          "required_slots": ["tracking_code"],
+          "optional_slots": {},
+          "result_slots": ["tracking_code", "status", "customer_name", "customer_phone"]
+        },
+        {
+          "name": "GetOrdersByStatus",
+          "description": "List orders that currently have a given status",
+          "is_transactional": false,
+          "required_slots": ["status"],
+          "optional_slots": {"date_range": "all time"},
+          "result_slots": ["status", "count", "tracking_code"]
+        },
+        {
+          "name": "GetOrdersByCustomer",
+          "description": "Find all orders placed by a given customer name or phone number",
+          "is_transactional": false,
+          "required_slots": [],
+          "optional_slots": {"customer_name": "", "customer_phone": ""},
+          "result_slots": ["customer_name", "customer_phone", "tracking_code", "status", "count"]
+        },
+        {
+          "name": "GetTodayOrders",
+          "description": "List orders placed today",
+          "is_transactional": false,
+          "required_slots": [],
+          "optional_slots": {},
+          "result_slots": ["tracking_code", "status", "count"]
+        },
+        {
+          "name": "GetSalesTotal",
+          "description": "Sum of order totals for a given time period",
+          "is_transactional": false,
+          "required_slots": ["date_range"],
+          "optional_slots": {},
+          "result_slots": ["count"]
+        },
+        {
+          "name": "UpdateOrderStatus",
+          "description": "Change the status of an order to a new value",
+          "is_transactional": true,
+          "required_slots": ["tracking_code", "status"],
+          "optional_slots": {},
+          "result_slots": ["tracking_code", "status"]
+        }
+      ]
+    },
+    {
+      "service_name": "TrendMart_Products",
+      "description": "Search products, check stock and view the product catalogue",
+      "slots": [
+        {
+          "name": "category",
+          "description": "Product category: school, side, travel, chappal, crocs, combo, tcombo, pant, shirt, tshirt, airpod, headphone, shoe, analog, smart, smc",
+          "is_categorical": true,
+          "possible_values": ["school", "side", "travel", "chappal", "crocs", "combo", "tcombo", "pant", "shirt", "tshirt", "airpod", "headphone", "shoe", "analog", "smart", "smc"]
+        },
+        {
+          "name": "product_code",
+          "description": "Unique code of a product, e.g. SC1LIK",
+          "is_categorical": false,
+          "possible_values": []
+        },
+        {
+          "name": "product_name",
+          "description": "Name of a product",
+          "is_categorical": false,
+          "possible_values": []
+        },
+        {
+          "name": "count",
+          "description": "Number of products",
+          "is_categorical": false,
+          "possible_values": []
+        },
+        {
+          "name": "out_of_stock",
+          "description": "Whether the product is out of stock",
+          "is_categorical": true,
+          "possible_values": ["true", "false"]
+        }
+      ],
+      "intents": [
+        {
+          "name": "GetProductCount",
+          "description": "Count total products, optionally within one category",
+          "is_transactional": false,
+          "required_slots": [],
+          "optional_slots": {"category": ""},
+          "result_slots": ["count"]
+        },
+        {
+          "name": "GetProductsByCategory",
+          "description": "List products in a given category",
+          "is_transactional": false,
+          "required_slots": ["category"],
+          "optional_slots": {},
+          "result_slots": ["product_name", "product_code", "category", "count"]
+        },
+        {
+          "name": "GetProductByCode",
+          "description": "Look up one product by its product code",
+          "is_transactional": false,
+          "required_slots": ["product_code"],
+          "optional_slots": {},
+          "result_slots": ["product_name", "product_code", "category", "out_of_stock"]
+        },
+        {
+          "name": "GetOutOfStock",
+          "description": "List products that are currently out of stock",
+          "is_transactional": false,
+          "required_slots": [],
+          "optional_slots": {},
+          "result_slots": ["product_name", "product_code", "count"]
+        }
+      ]
+    }
+  ]
+}
