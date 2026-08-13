@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Topics</title>
+    <!-- Add Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            position: relative;
+        }
+        h2, h3 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+            margin-top: 0;
+            padding-left: 40px;
+        }
+        .question-list {
+            display: block;
+        }
+        .question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e8e8e8;
+            color: #333;
+            font-size: 16px;
+        }
+        .question a {
+            text-decoration: none;
+            color: #333;
+            flex-grow: 1;
+        }
+        .arrow {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #999;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #999;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .arrow:hover {
+            border-color: #666;
+            color: #666;
+        }
+        .question:last-child {
+            border-bottom: none;
+        }
+        .back-arrow {
+            position: absolute;
+            top: 8px;
+            left: 15px;
+            font-size: 28px;
+            font-weight: 900;
+            color: #333;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            background: none;
+            border: none;
+            padding: 0;
+            line-height: 1;
+        }
+        .back-arrow:hover {
+            color: #000;
+        }
+        .details-section {
+            display: none;
+            padding: 20px 0;
+        }
+        .details-section.active {
+            display: block;
+        }
+        /* Social Media Icon CSS */
+        .fab {
+            font-size: 30px;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+        .fa-instagram {
+            color: #E4405F;
+        }
+        .fa-whatsapp {
+            color: #25D366;
+        }
+        .fa-telegram-plane {
+            color: #0088CC;
+        }
+        .fab:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="#" class="back-arrow" id="backArrow" onclick="goBack(event)">←</a>
+        <div class="question-list" id="questionList">
+            <h2>What issue are you facing?</h2>
+            <div class="question">
+                <a href="#">How to place an order?</a>
+                <span class="arrow" onclick="showDetails('order')">→</span>
+            </div>
+            <div class="question">
+                <a href="#">Terms & Condition</a>
+                <span class="arrow" onclick="showDetails('address')">→</span>
+            </div>
+            <div class="question">
+                <a href="#">Return policy</a>
+                <span class="arrow" onclick="showDetails('return')">→</span>
+            </div>
+            <div class="question">
+                <a href="#">About & Contact</a>
+                <span class="arrow" onclick="showDetails('contact')">→</span>
+            </div>
+        </div>
+
+        <div class="details-section" id="detailsOrder">
+            <a href="#" class="back-arrow" onclick="goBack(event)">←</a>
+            <h3>How to place an order</h3>
+            <div class="content">
+                <p>Click the "Buy Now" Button – When you find a product you like, simply click the "Buy Now" button.</p>
+                <p>Redirect to WhatsApp – You will be redirected to WhatsApp, where the product details will be sent automatically.</p>
+                <p>Confirm Your Order – Our team will review your request and confirm the order with pricing, availability, and payment details.</p>
+                <p>Complete the Payment – Once confirmed, proceed with the payment using the available options.</p>
+                <p>Get Your Order Delivered – Your order will be shipped, and tracking details will be provided for easy monitoring.</p>
+                <p>At Trend Mart, we ensure a seamless and convenient shopping experience. Start shopping now and upgrade your style!</p>
+                <p><strong>Note:</strong> Payment is accepted only via UPI, and all UPI options are available. Cash on Delivery not Available.</p>
+            </div>
+            <div class="other-items">
+                <div class="question">
+                    <a href="#">Terms & Condition</a>
+                    <span class="arrow" onclick="showDetails('address')">→</span>
+                </div>
+                <div class="question">
+                    <a href="#">Return policy</a>
+                    <span class="arrow" onclick="showDetails('return')">→</span>
+                </div>
+                <div class="question">
+                    <a href="#">About & Contact</a>
+                    <span class="arrow" onclick="showDetails('contact')">→</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="details-section" id="detailsAddress">
+            <a href="#" class="back-arrow" onclick="goBack(event)">←</a>
+            <h3>Terms & Condition</h3>
+            <div class="content">
+                <p>We are not responsible for product delivery as we hand over the shipment to courier services. Delivery is managed by the respective courier teams, 
+                but in case of any issues, we will fully support you to ensure successful delivery. Rest assured, your product will be delivered. We commonly use DTDC and
+                Blue Dart for shipping. If any issues arise with these couriers, 
+                we will arrange an alternative courier for your order.</p>
+                <p><strong>Note:</strong> Orders cannot be canceled once they are processed and shipped.</p>
+            </div>
+            <div class="other-items">
+                <div class="question">
+                    <a href="#">How to place an order?</a>
+                    <span class="arrow" onclick="showDetails('order')">→</span>
+                </div>
+                <div class="question">
+                    <a href="#">Return policy</a>
+                    <span class="arrow" onclick="showDetails('return')">→</span>
+                </div>
+                <div class="question">
+                    <a href="#">About & Contact</a>
+                    <span class="arrow" onclick="showDetails('contact')">→</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="details-section" id="detailsReturn">
+            <a href="#" class="back-arrow" onclick="goBack(event)">←</a>
+            <h3>Return policy</h3>
+            <div class="content">
+                <p>At Trend Mart, we do not accept returns or exchanges after an order has been shipped; however, if you receive an incorrect or damaged item, please contact our customer support via <a href="https://wa.me/9188384350">WhatsApp</a> within 48 hours of delivery and provide an unedited video that captures the entire unboxing process—including a clear view of the unopened package with the shipping label and your address, as well as a 360-degree view of the product clearly showing any damage—so that our team can verify your claim and arrange for a replacement or suitable solution.</p>
+                <p><strong>Note:</strong> Otherwise no return strictly.</p>
+            </div>
+            <div class="other-items">
+                <div class="question">
+                    <a href="#">How to place an order?</a>
+                    <span class="arrow" onclick="showDetails('order')">→</span>
+                </div>
+                <div class="question">
+                    <a href="#">Terms & Condition</a>
+                    <span class="arrow" onclick="showDetails('address')">→</span>
+                </div>
+                <div class="question">
+                    <a href="#">About & Contact</a>
+                    <span class="arrow" onclick="showDetails('contact')">→</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="details-section" id="detailsContact">
+            <a href="#" class="back-arrow" onclick="goBack(event)">←</a>
+            <h3>About & Contact</h3>
+            <div class="content">
+                <p>Welcome to Trend Mart, your go-to destination for high-quality fashion at the best prices. We specialize in men’s fashion, offering trendy and stylish products with All-India delivery.</p>
+                <p>We are committed to bringing you the latest trends, top-quality materials, and unbeatable deals—all from the comfort of your home.</p>
+                <p>At Trend Mart, we ensure a seamless and convenient shopping experience. Start shopping now and upgrade your style!</p>
+                <p>Thank you</p>
+                <p>Follow us:</p>
+                <p>
+                    <a href="https://www.instagram.com/trend._.mart_official?igsh=MXU4cjQwcWs1Ymp1bA==" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://chat.whatsapp.com/JNq2Yx8lbp7BQLcAemjRKE" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    <a href="https://t.me/+dLr-zLtxYKNhODVl" target="_blank"><i class="fab fa-telegram-plane"></i></a>
+                </p>
+            </div>
+            <div class="other-items">
+                <div class="question">
+                    <a href="#">How to place an order?</a>
+                    <span class="arrow" onclick="showDetails('order')">→</span>
+                </div>
+                <div class="question">
+                    <a href="#">Terms & Condition</a>
+                    <span class="arrow" onclick="showDetails('address')">→</span>
+                </div>
+                <div class="question">
+                    <a href="#">Return policy</a>
+                    <span class="arrow" onclick="showDetails('return')">→</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showDetails(section) {
+            document.getElementById('questionList').style.display = 'none';
+            document.querySelectorAll('.details-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById('details' + section.charAt(0).toUpperCase() + section.slice(1)).classList.add('active');
+            window.history.pushState({ section: section }, '', '#' + section);
+        }
+
+        function goBack(event) {
+            event.preventDefault();
+            document.querySelectorAll('.details-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById('questionList').style.display = 'block';
+            window.history.back();
+        }
+
+        window.onpopstate = function(event) {
+            if (!event.state || !event.state.section) {
+                document.querySelectorAll('.details-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById('questionList').style.display = 'block';
+            } else {
+                document.getElementById('questionList').style.display = 'none';
+                document.querySelectorAll('.details-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById('details' + event.state.section.charAt(0).toUpperCase() + event.state.section.slice(1)).classList.add('active');
+            }
+        };
+
+        window.onload = function() {
+            if (window.location.hash) {
+                const section = window.location.hash.substring(1);
+                showDetails(section);
+            }
+        };
+    </script>
+</body>
+</html>
