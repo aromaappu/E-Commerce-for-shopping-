@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help - Trend Mart</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; }
+        header {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: #fff; width: 100%; padding: 20px 25px; height: 100px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .header-logo { display: flex; align-items: center; background: none; margin-right: auto; cursor: pointer; }
+        .header-logo img { height: 40px; margin-right: 10px; }
+        .header-logo h1 { font-size: 1.3rem; color: #333; }
+        .main {
+            max-width: 800px; margin: 0 auto; padding: 130px 15px 90px;
+        }
+        .card {
+            background: #fff; border: 1px solid #ddd; border-radius: 10px;
+            padding: 25px; margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        .card h2 { font-size: 1.3rem; color: #333; margin-bottom: 10px; }
+        .card p { font-size: 0.95rem; color: #555; line-height: 1.6; margin-bottom: 8px; }
+        .card a { color: #25D366; font-weight: 600; text-decoration: none; }
+        .btn {
+            display: block; text-align: center; background: #25D366; color: #fff;
+            padding: 14px; border-radius: 8px; text-decoration: none;
+            font-weight: 600; font-size: 1rem; margin-top: 10px;
+        }
+        .btn.secondary { background: #333; }
+        .footer {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000;
+            display: flex; justify-content: space-around; align-items: center;
+            background: #fff; border-top: 1px solid #eee; padding: 10px 0; height: 70px;
+        }
+        .nav-item { text-align: center; cursor: pointer; }
+        .nav-item img { width: 28px; height: 28px; display: block; margin: 0 auto; }
+        .nav-item p { font-size: 0.75rem; color: #333; margin-top: 2px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-logo" onclick="window.location.href='index.html'">
+            <img src="https://ycezesfuypzgdmpamooh.supabase.co/storage/v1/object/public/product-images/main/logo2.png" alt="Trend Mart Logo">
+            <h1>Trend Mart</h1>
+        </div>
+    </header>
+
+    <div class="main">
+        <div class="card">
+            <h2>About Trend Mart</h2>
+            <p>Your one-stop shop for bags, chappals, crocs, shoes, watches, dresses and more — all at great prices.</p>
+        </div>
+        <div class="card">
+            <h2>Order on WhatsApp</h2>
+            <p>Pick your products and send your order directly on WhatsApp. Fast, easy and no account needed.</p>
+            <a class="btn" href="https://wa.me/9188384350" target="_blank" rel="noopener">Order on WhatsApp</a>
+        </div>
+        <div class="card">
+            <h2>Track Your Order</h2>
+            <p>Enter your tracking code to see the delivery status of your order.</p>
+            <a class="btn secondary" href="track.html">Track Order</a>
+        </div>
+        <div class="card">
+            <h2>Browse Categories</h2>
+            <p>See all product categories in one place.</p>
+            <a class="btn secondary" href="categories.html">View Categories</a>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="nav-item" onclick="window.location.href='index.html'">
+            <img src="https://img.icons8.com/ios-filled/50/333333/home.png" alt="Home">
+            <p>Home</p>
+        </div>
+        <div class="nav-item" onclick="window.location.href='categories.html'">
+            <img src="https://img.icons8.com/ios-filled/50/333333/category.png" alt="Categories">
+            <p>Categories</p>
+        </div>
+        <div class="nav-item">
+            <img src="https://img.icons8.com/ios-filled/50/333333/about.png" alt="About">
+            <p>Help</p>
+        </div>
+    </div>
+</body>
+</html>

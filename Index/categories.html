@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories - Trend Mart</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; }
+        header {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: #fff; width: 100%; padding: 20px 25px; height: 100px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .header-logo { display: flex; align-items: center; background: none; margin-right: auto; }
+        .header-logo img { height: 40px; margin-right: 10px; }
+        .header-logo h1 { font-size: 1.3rem; color: #333; }
+        .main {
+            max-width: 1200px; margin: 0 auto; padding: 130px 15px 80px;
+        }
+        h2 { font-size: 1.5rem; font-weight: 500; color: #333; text-align: center; margin-bottom: 20px; }
+        .cat-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;
+        }
+        .cat-item {
+            background: #fff; border: 1px solid #ddd; border-radius: 10px;
+            padding: 20px 10px; text-align: center; cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08); transition: transform 0.15s;
+        }
+        .cat-item:active { transform: scale(0.97); }
+        .cat-item img { width: 48px; height: 48px; object-fit: contain; margin-bottom: 8px; }
+        .cat-item span { font-size: 0.9rem; color: #333; }
+        .footer {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000;
+            display: flex; justify-content: space-around; align-items: center;
+            background: #fff; border-top: 1px solid #eee; padding: 10px 0;
+            height: 70px;
+        }
+        .nav-item { text-align: center; }
+        .nav-item img { width: 28px; height: 28px; display: block; margin: 0 auto; }
+        .nav-item p { font-size: 0.75rem; color: #333; margin-top: 2px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-logo" onclick="window.location.href='index.html'" style="cursor:pointer">
+            <img src="https://ycezesfuypzgdmpamooh.supabase.co/storage/v1/object/public/product-images/main/logo2.png" alt="Trend Mart Logo">
+            <h1>Trend Mart</h1>
+        </div>
+    </header>
+
+    <div class="main">
+        <h2>All Categories</h2>
+        <div class="cat-grid">
+            <div class="cat-item" onclick="window.location.href='bag/school.html'">
+                <img src="https://ycezesfuypzgdmpamooh.supabase.co/storage/v1/object/public/product-images/main/bag.jpg" alt="School Bag">
+                <span>School Bag</span>
+            </div>
+            <div class="cat-item" onclick="window.location.href='bag/side.html'">
+                <img src="https://img.icons8.com/ios-filled/50/333333/shopping-bag.png" alt="Side Bag">
+                <span>Side Bag</span>
+            </div>
+            <div class="cat-item" onclick="window.location.href='bag/travel.html'">
+                <img src="https://img.icons8.com/ios-filled/50/333333/suitcase.png" alt="Travel Bag">
+                <span>Travel Bag</span>
+            </div>
+            <div class="cat-item" onclick="window.location.href='chappal/chappal.html'">
+                <img src="https://ycezesfuypzgdmpamooh.supabase.co/storage/v1/object/public/product-images/main/cherupp.jpg" alt="Chappal">
+                <span>Chappal</span>
+            </div>
+            <div class="cat-item" onclick="window.location.href='chappal/crocs.html'">
+                <img src="https://ycezesfuypzgdmpamooh.supabase.co/storage/v1/object/public/product-images/main/chappal.jpg" alt="Crocs">
+                <span>Crocs</span>
+            </div>
+            <div class="cat-item" onclick="window.location.href='shoe/shoe.html'">
+                <img src="https://ycezesfuypzgdmpamooh.supabase.co/storage/v1/object/public/product-images/main/shoe.jpeg" alt="Shoe">
+                <span>Shoe</span>
+            </div>
+            <div class="cat-item" onclick="window.location.href='watch/analog.html'">
+                <img src="https://img.icons8.com/ios-filled/50/333333/clock.png" alt="Analog Watch">
+                <span>Analog</span>
+            </div>
+            <div class="cat-item" onclick="window.location.href='watch/smart.html'">
+                <img src="https://ycezesfuypzgdmpamooh.supabase.co/storage/v1/object/public/product-images/main/smartcombo.jpg" alt="Smart Watch">
+                <span>Smart</span>
+            </div>
+            <div class="cat-item" onclick="window.location.href='watch/smc.html'">
+                <img src="https://img.icons8.com/ios-filled/50/333333/smartwatch.png" alt="Smart Watch Combo">
+                <span>Smart Combo</span>
+            </div>
+            <div class="cat-item" onclick="window.location.href='dress/combo.html'">
+                <img src="https://img.icons8.com/ios-filled/50/333333/checkmark.png" alt="Shirt Combo">
+                <span>Shirt Combo</span>
+            </div>
+            <div class="cat-item" onclick="window.location.href='dress/combotshirt.html'">
+                <img src="https://img.icons8.com/ios-filled/50/333333/checkmark.png" alt="T Shirt Combo">
+                <span>T Shirt Combo</span>
+            </div>
+            <div class="cat-item" onclick="window.location.href='dress/pant.html'">
+                <img src="https://ycezesfuypzgdmpamooh.supabase.co/storage/v1/object/public/product-images/main/pant.jpeg" alt="Pant">
+                <span>Pant</span>
+            </div>
+            <div class="cat-item" onclick="window.location.href='dress/shirt.html'">
+                <img src="https://img.icons8.com/ios-filled/50/333333/t-shirt.png" alt="Shirt">
+                <span>Shirt</span>
+            </div>
+            <div class="cat-item" onclick="window.location.href='dress/tshirt.html'">
+                <img src="https://img.icons8.com/ios-filled/50/333333/t-shirt.png" alt="T Shirt">
+                <span>T Shirt</span>
+            </div>
+            <div class="cat-item" onclick="window.location.href='headset/headphone.html'">
+                <img src="https://img.icons8.com/ios-filled/50/333333/headset.png" alt="Headphone">
+                <span>Headphone</span>
+            </div>
+            <div class="cat-item" onclick="window.location.href='headset/airpod.html'">
+                <img src="https://img.icons8.com/ios-filled/50/333333/airpods-pro.png" alt="Airpod">
+                <span>Airpod</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="nav-item" onclick="window.location.href='index.html'">
+            <img src="https://img.icons8.com/ios-filled/50/333333/home.png" alt="Home">
+            <p>Home</p>
+        </div>
+        <div class="nav-item">
+            <img src="https://img.icons8.com/ios-filled/50/333333/category.png" alt="Categories">
+            <p>Categories</p>
+        </div>
+        <div class="nav-item" onclick="window.location.href='about.html'">
+            <img src="https://img.icons8.com/ios-filled/50/333333/about.png" alt="About">
+            <p>Help</p>
+        </div>
+    </div>
+</body>
+</html>
