@@ -1,0 +1,8 @@
+[build]
+  publish = "Index"
+  command = ""
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin/admin.html"
+  status = 200
