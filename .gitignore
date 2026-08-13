@@ -1,0 +1,19 @@
+# SECRETS - never commit
+.opencode-session-summary.md
+.env
+.env.local
+
+# Local logs / temp
+serve.log
+supabase/.temp/
+*.log
+
+# Local LLM model (208MB, over GitHub 100MB limit)
+chatbot/*.gguf
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db

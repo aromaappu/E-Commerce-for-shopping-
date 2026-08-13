@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order | Trend Mart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+        body { background: #fff; color: #333; min-height: 100vh; }
+        header {
+            background: #fff; padding: 15px 25px; height: 80px;
+            display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000;
+        }
+        header .back-arrow { font-size: 2rem; cursor: pointer; color: #333; text-decoration: none; }
+        header h1 { font-size: 1.6rem; font-weight: 600; }
+        .container { max-width: 700px; margin: 30px auto; padding: 0 15px 100px; }
+        .track-form {
+            background: #fafafa; border: 1px solid #eee; border-radius: 10px;
+            padding: 30px 20px; text-align: center;
+        }
+        .track-form h2 { font-size: 1.4rem; margin-bottom: 8px; }
+        .track-form p { color: #777; font-size: 14px; margin-bottom: 18px; }
+        .track-form input {
+            width: 100%; max-width: 360px; padding: 14px; border: 1px solid #ccc; border-radius: 8px;
+            font-size: 16px; text-align: center; text-transform: uppercase; letter-spacing: 2px;
+        }
+        .track-form .btn {
+            display: block; width: 100%; max-width: 360px; margin: 15px auto 0;
+            padding: 14px; border: none; border-radius: 8px; background: #1a1a1a; color: #fff;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+        }
+        .track-form .btn:disabled { opacity: 0.6; }
+        .result { display: none; margin-top: 25px; }
+        .result .card {
+            border: 1px solid #eee; border-radius: 10px; padding: 20px;
+        }
+        .result .card h3 { margin-bottom: 4px; }
+        .result .code { color: #0a7d3a; font-weight: 700; letter-spacing: 1px; }
+        .steps { display: flex; flex-direction: column; gap: 0; margin: 25px 0 10px; }
+        .step {
+            display: flex; gap: 14px; align-items: flex-start; position: relative;
+            padding-bottom: 22px;
+        }
+        .step:not(:last-child)::before {
+            content: ''; position: absolute; left: 13px; top: 30px; bottom: 0; width: 2px; background: #ddd;
+        }
+        .step .dot {
+            width: 28px; height: 28px; border-radius: 50%; background: #e8e8e8; color: #999;
+            display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;
+            flex-shrink: 0; z-index: 1;
+        }
+        .step.done .dot { background: #25a84d; color: #fff; }
+        .step.active .dot { background: #1a1a1a; color: #fff; box-shadow: 0 0 0 4px rgba(26,26,26,.15); }
+        .step .label { font-weight: 600; }
+        .step .time { font-size: 12px; color: #888; margin-top: 2px; }
+        .items { margin-top: 15px; border-top: 1px dashed #ddd; padding-top: 12px; }
+        .item-row { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; }
+        .total-row { font-weight: 700; border-top: 1px solid #eee; margin-top: 6px; padding-top: 8px; display: flex; justify-content: space-between; }
+        .err { background: #fff3f3; border: 1px solid #f5c2c2; color: #b3261e; border-radius: 8px; padding: 15px; text-align: center; margin-top: 20px; display: none; }
+        .store-tip { text-align: center; font-size: 13px; color: #999; margin-top: 25px; }
+    </style>
+</head>
+<body>
+    <header>
+        <span class="back-arrow" onclick="history.back()">←</span>
+        <h1>Track Order</h1>
+    </header>
+    <div class="container">
+        <div class="track-form">
+            <h2>Track your order</h2>
+            <p>Enter the tracking code you received on WhatsApp</p>
+            <input id="track-input" placeholder="e.g. TM-8F42K1" onkeydown="if(event.key==='Enter')trackOrder()">
+            <button class="btn" id="track-btn" onclick="trackOrder()">Track Order</button>
+        </div>
+        <div class="result" id="result"></div>
+        <div class="err" id="err"></div>
+        <div class="store-tip">Order not found? Contact us on WhatsApp with your code.</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="shared/config.js"></script>
+    <script src="shared/supabase-client.js"></script>
+    <script>
+        const STATUS_ORDER = ["Order Placed", "Confirmed", "Packed", "Shipped", "Delivered"];
+
+        async function trackOrder() {
+            const code = document.getElementById('track-input').value.trim().toUpperCase();
+            const err = document.getElementById('err');
+            const result = document.getElementById('result');
+            const btn = document.getElementById('track-btn');
+            err.style.display = 'none';
+            result.style.display = 'none';
+
+            if (!code) { err.textContent = "Please enter your tracking code."; err.style.display = 'block'; return; }
+            if (!window.TMSupabase.isConfigured()) {
+                err.innerHTML = "Order tracking is not connected yet. Please contact us on WhatsApp.";
+                err.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = "Searching...";
+            const res = await window.TMSupabase.getOrderByCode(code);
+            btn.disabled = false;
+            btn.textContent = "Track Order";
+
+            if (!res.ok || !res.data) {
+                err.textContent = "No order found with this tracking code. Please check and try again.";
+                err.style.display = 'block';
+                return;
+            }
+
+            const order = res.data;
+            const history = (order.status_history || []);
+            const historyMap = {};
+            history.forEach(function (h) { historyMap[h.status] = h.at; });
+            const currentIdx = STATUS_ORDER.indexOf(order.status);
+            const isComplete = currentIdx === STATUS_ORDER.length - 1;
+
+            const stepsHtml = STATUS_ORDER.map(function (s, i) {
+                let cls = 'step';
+                if (isComplete || i < currentIdx) cls = 'step done';
+                else if (i === currentIdx) cls = 'step active';
+                const time = historyMap[s] ? new Date(historyMap[s]).toLocaleString("en-IN") : "";
+                return '<div class="' + cls + '">' +
+                    '<div class="dot">' + ((isComplete || i < currentIdx) ? '✓' : (i + 1)) + '</div>' +
+                    '<div><div class="label">' + s + '</div>' + (time ? '<div class="time">' + time + '</div>' : '') + '</div>' +
+                    '</div>';
+            }).join('');
+
+            const itemRows = (order.items || []).map(function (it) {
+                return '<div class="item-row"><span>' + it.name + ' × ' + it.qty + '</span><span>' + it.price + '</span></div>';
+            }).join('');
+
+            result.innerHTML = '<div class="card">' +
+                '<h3>Order ' + order.tracking_code + '</h3>' +
+                '<div class="code">Status: ' + order.status + '</div>' +
+                '<div class="steps">' + stepsHtml + '</div>' +
+                '<div class="items">' + itemRows +
+                    '<div class="total-row"><span>Total</span><span>₹' + (Number(order.total) || 0).toLocaleString("en-IN") + '</span></div>' +
+                '</div>' +
+                '<div style="font-size:12px;color:#888;margin-top:10px;">Ordered: ' + new Date(order.created_at || order.order_time).toLocaleString("en-IN") + '</div>' +
+                '</div>';
+            result.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
