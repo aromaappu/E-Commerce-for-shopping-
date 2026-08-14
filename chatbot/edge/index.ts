@@ -370,8 +370,11 @@ async function respond(reqBody: { message?: string; session_id?: string }): Prom
       state.pendingConfirm = null;
       return executeIntent(state, sessionId, message);
     }
-    // Status/info questions about that same order.
+    // Status/info questions about that same order. Skip when this is clearly
+    // a fresh count/list request ("how many delivered orders?") — the count
+    // guard mirrors the one on the status-change branch above.
     if (!/\b(update|change|mark|set|move)\b/.test(tNorm) &&
+        !/(\bhow many\b|\bcount\b|\bnumber of\b|\bshow\b|\blist\b)/.test(tNorm) &&
         /\b(status|tracking|details?|info|where|when|delivery|date|placed|shipped|delivered|packed|came|arrived|yet)\b/.test(tNorm)) {
       state.activeIntent = "GetOrderByCode";
       state.slots = { tracking_code: followUpCode };
