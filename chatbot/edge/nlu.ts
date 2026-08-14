@@ -360,7 +360,12 @@ const NAME_SKIP = new Set([
 export function extractCustomerName(text: string): string | undefined {
   // "arun's orders" style.
   const poss = text.match(/([A-Za-z]{2,})['’]s\s+(?:orders?|purchases|deliveries|shipments|items|buys)/i);
-  if (poss) return poss[1];
+  if (poss) {
+    const name = poss[1];
+    const lower = name.toLowerCase();
+    // "today's orders" / "yesterday's orders" are time phrases, not names.
+    if (!NAME_SKIP.has(lower) && !NAME_SKIP.has(lower.split(/\s+/)[0])) return name;
+  }
   const patterns = [
     /^([A-Za-z][A-Za-z'-]{1,20})\s+(?:current\s+)?(?:status|stauts|statis|statuz)\b/i,
     /^([A-Za-z][A-Za-z'-]{1,20})\s+customer\b/i,
@@ -565,7 +570,9 @@ export function detectIntent(message: string, slots: Slots): { intent: IntentNam
   if (hasAny(t, ["how many", "count", "total", "number of"]) && hasAny(t, ["order", "orders"])) {
     return { intent: "GetOrderCount", matched: true };
   }
-  if (hasAny(t, ["order", "orders"]) && hasRange) {
+  // A bare "orders + date range" that asks to SEE the list ("show me today's
+  // orders") must fall through to GetTodayOrders, not return a count.
+  if (hasAny(t, ["order", "orders"]) && hasRange && !hasAny(t, ["show", "list", "give me", "send", "display", "see", "what"])) {
     return { intent: "GetOrderCount", matched: true };
   }
 

@@ -11,7 +11,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const DIR = path.join(__dirname, "..", "supabase", "functions", "chat-support");
+const DIR = path.join(__dirname, "edge");
 const read = (f) => fs.readFileSync(path.join(DIR, f), "utf8");
 
 const model = fs.readFileSync(path.join(DIR, "nlp-model.json"), "utf8").trim();
