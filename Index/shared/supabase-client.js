@@ -118,13 +118,32 @@
         }
     }
 
+    const CATEGORY_FALLBACK_IMAGES = {
+        analog: "/main/analog.jpg",
+        pant: "/main/pant.jpeg",
+        shirt: "/main/shirt.jpg",
+        travel: "/main/travel.jpeg",
+        chappal: "/main/chappal.jpg",
+        crocs: "/main/chappal.jpg",
+        combo: "/main/combo.jpg",
+        tshirt: "/main/print t shirt.jpg",
+        airpod: "/main/airpod.jpg",
+        tcombo: "/main/print combo.jpg",
+        shoe: "/main/shoe.jpeg",
+        headphone: "/main/buds.jpg",
+        smart: "/main/smartcombo.jpg",
+        smc: "/main/smartcombo.jpg",
+        school: "/main/bag.jpg",
+        side: "/main/side.jpg"
+    };
+
     function dbProductToSite(p) {
         return {
             id: p.id,
             name: p.name,
             price: p.price,
             mrp: p.mrp || '',
-            img: p.image_url,
+            img: p.image_url || (CATEGORY_FALLBACK_IMAGES[p.category] || "/main/others.jpg"),
             code: p.product_code,
             desc: p.description,
             description: p.description,
