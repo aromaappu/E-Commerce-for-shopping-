@@ -59,6 +59,10 @@ app.use((err, req, res, _next) => {
   res.status(status).json({ error: err.message || "Server error" });
 });
 
-app.listen(config.port, () => {
-  console.log(`✔ ${config.storeName} API running on http://localhost:${config.port}`);
-});
+export { app };
+
+if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url))) {
+  app.listen(config.port, () => {
+    console.log(`✔ ${config.storeName} API running on http://localhost:${config.port}`);
+  });
+}

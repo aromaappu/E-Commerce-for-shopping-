@@ -46,7 +46,7 @@ export function CartProvider({ children }) {
             code: product.code,
             name: product.name,
             price: product.price,
-            img: product.img,
+            img: product.image_url || product.img,
             desc: product.desc,
             qty,
             addedAt: Date.now()
