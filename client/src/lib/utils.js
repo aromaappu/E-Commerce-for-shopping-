@@ -76,6 +76,7 @@ export function openWhatsApp(number, message, win) {
 }
 
 export function buyNowWhatsApp(product, whatsappNumber) {
+  const num = whatsappNumber || "9188384350";
   const lines = [
     "Hey I'm interested to buy this product",
     "",
@@ -85,5 +86,5 @@ export function buyNowWhatsApp(product, whatsappNumber) {
   ];
   if (product.image_url) lines.push(`Image: ${product.image_url}`);
   lines.push("", "Please confirm my order.");
-  openWhatsApp(whatsappNumber, lines.join("\n"));
+  openWhatsApp(num, lines.join("\n"));
 }

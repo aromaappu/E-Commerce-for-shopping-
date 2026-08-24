@@ -10,6 +10,7 @@ import { buildOrderMessage, openWhatsApp, parsePrice } from "../lib/utils.js";
  */
 export default function OrderModal({ items, onClose, onSuccess }) {
   const { whatsappNumber } = useConfig();
+  const waNum = whatsappNumber || "9188384350";
   const { showToast } = useCart();
   const [form, setForm] = useState({ name: "", phone: "", address: "" });
   const [errors, setErrors] = useState({});
@@ -76,7 +77,7 @@ export default function OrderModal({ items, onClose, onSuccess }) {
         trackingCode: code,
         total
       });
-      openWhatsApp(whatsappNumber, message, winRef.current);
+      openWhatsApp(waNum, message, winRef.current);
 
       onSuccess({
         trackingCode: code,

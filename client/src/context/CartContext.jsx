@@ -24,6 +24,26 @@ export function CartProvider({ children }) {
     localStorage.setItem(KEY, JSON.stringify(items));
   }, [items]);
 
+  useEffect(() => {
+    const missing = items.filter((i) => !i.img && i.code);
+    if (missing.length === 0) return;
+    fetch("/api/products?limit=1000")
+      .then((r) => r.json())
+      .then((all) => {
+        const products = all.products || all || [];
+        const map = {};
+        products.forEach((p) => { map[p.product_code || p.code] = p; });
+        setItems((prev) =>
+          prev.map((i) => {
+            if (i.img || !map[i.code]) return i;
+            const p = map[i.code];
+            return { ...i, img: p.image_url || "", image_url: p.image_url || "" };
+          })
+        );
+      })
+      .catch(() => {});
+  }, []);
+
   const showToast = useCallback((msg) => {
     setToast(msg);
     clearTimeout(toastTimer.current);
@@ -46,7 +66,8 @@ export function CartProvider({ children }) {
             code: product.code,
             name: product.name,
             price: product.price,
-            img: product.image_url || product.img,
+            img: product.image_url || product.img || "",
+            image_url: product.image_url || product.img || "",
             desc: product.desc,
             qty,
             addedAt: Date.now()
