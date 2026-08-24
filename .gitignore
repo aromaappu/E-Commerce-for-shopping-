@@ -3,6 +3,9 @@
 .env
 .env.local
 
+# Build output
+client/dist/
+
 # Local logs / temp
 serve.log
 supabase/.temp/
