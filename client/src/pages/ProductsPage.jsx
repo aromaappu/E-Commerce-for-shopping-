@@ -2,12 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { api } from "../lib/api.js";
 import { useCart } from "../context/CartContext.jsx";
+import { useConfig } from "../context/ConfigContext.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import ProductModal from "../components/ProductModal.jsx";
-import OrderModal from "../components/OrderModal.jsx";
-import OrderSuccessModal from "../components/OrderSuccessModal.jsx";
 import { categoryLabel } from "../lib/constants.js";
-import { parsePrice } from "../lib/utils.js";
+import { parsePrice, buyNowWhatsApp } from "../lib/utils.js";
 
 const SORTS = {
   featured: "Featured",
@@ -25,9 +24,8 @@ export default function ProductsPage() {
   const [sort, setSort] = useState("featured");
   const [shown, setShown] = useState(16);
   const [viewing, setViewing] = useState(null);
-  const [buying, setBuying] = useState(null);
-  const [success, setSuccess] = useState(null);
   const { add } = useCart();
+  const { whatsappNumber } = useConfig();
 
   useEffect(() => {
     setLoading(true);
@@ -85,7 +83,7 @@ export default function ProductsPage() {
                 product={p}
                 onView={setViewing}
                 onAdd={(prod) => add(prod)}
-                onBuy={(prod) => setBuying([{ ...prod, qty: 1 }])}
+                onBuy={(prod) => buyNowWhatsApp(prod, whatsappNumber)}
               />
             ))}
           </div>
@@ -107,21 +105,10 @@ export default function ProductsPage() {
           }}
           onBuy={(p) => {
             setViewing(null);
-            setBuying([p]);
+            buyNowWhatsApp(p, whatsappNumber);
           }}
         />
       )}
-      {buying && (
-        <OrderModal
-          items={buying}
-          onClose={() => setBuying(null)}
-          onSuccess={(r) => {
-            setBuying(null);
-            setSuccess(r);
-          }}
-        />
-      )}
-      {success && <OrderSuccessModal result={success} onClose={() => setSuccess(null)} />}
     </main>
   );
 }

@@ -74,3 +74,16 @@ export function openWhatsApp(number, message, win) {
   }
   window.open(url, "_blank");
 }
+
+export function buyNowWhatsApp(product, whatsappNumber) {
+  const lines = [
+    "Hey I'm interested to buy this product",
+    "",
+    `Product: ${product.name}`,
+    `Code: ${product.product_code || product.code || ""}`,
+    `Price: ${product.price}`,
+  ];
+  if (product.image_url) lines.push(`Image: ${product.image_url}`);
+  lines.push("", "Please confirm my order.");
+  openWhatsApp(whatsappNumber, lines.join("\n"));
+}
