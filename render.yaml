@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: trendmart-api
+    runtime: node
+    buildCommand: cd server && npm install
+    startCommand: node server/src/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
