@@ -53,17 +53,11 @@ export function CartProvider({ children }) {
   const add = useCallback(
     (product, qty = 1) => {
       setItems((prev) => {
-        const found = prev.find((i) => i.id === product.id || i.code === product.code);
-        if (found) {
-          return prev.map((i) =>
-            i === found ? { ...i, qty: i.qty + qty, addedAt: Date.now() } : i
-          );
-        }
         return [
           ...prev,
           {
             id: product.id,
-            code: product.code,
+            code: product.code + "_" + Date.now(),
             name: product.name,
             price: product.price,
             img: product.image_url || product.img || "",
