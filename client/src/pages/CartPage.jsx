@@ -38,7 +38,7 @@ export default function CartPage() {
         <div className="cart-list">
           {items.map((it) => (
             <div key={it.code} className="cart-row">
-              <img src={it.img || "/logo.png"} alt={it.name} />
+              <img src={it.img || it.image_url || "/logo.png"} alt={it.name} />
               <div className="cart-info">
                 <b>{it.name}</b>
                 <span className="code-chip">{it.code}</span>
