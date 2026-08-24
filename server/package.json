@@ -1,9 +1,22 @@
 {
-"name": "trend-mart",
+"name": "trend-mart-server",
 "version": "2.0.0",
 "private": true,
+"type": "module",
+"main": "src/index.js",
 "scripts": {
-"build": "npm install --prefix server && npm install --prefix client && npm run build --prefix client",
-"start": "npm start --prefix server"
+"dev": "nodemon src/index.js",
+"start": "node src/index.js"
+},
+"dependencies": {
+"@supabase/supabase-js": "^2.47.10",
+"cors": "^2.8.5",
+"dotenv": "^16.4.7",
+"express": "^4.21.2",
+"jsonwebtoken": "^9.0.2",
+"multer": "^2.0.1"
+},
+"devDependencies": {
+"nodemon": "^3.1.9"
 }
 }
