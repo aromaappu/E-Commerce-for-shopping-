@@ -215,6 +215,10 @@ router.get(
       supabase.from("popups").select("*").eq("active", true).order("created_at", { ascending: false })
     ]);
 
+    for (const result of [offersRes, bannersRes, popupsRes]) {
+      if (result.error) throw new HttpError(500, "Could not load store content");
+    }
+
     const now = Date.now();
     const popups = (popupsRes.data || []).filter((p) => {
       const start = p.start_date ? new Date(p.start_date).getTime() : 0;

@@ -2,13 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../lib/api.js";
 import { useCart } from "../context/CartContext.jsx";
-import { useConfig } from "../context/ConfigContext.jsx";
 import OfferBar from "../components/OfferBar.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import ProductModal from "../components/ProductModal.jsx";
 import PopupModal from "../components/PopupModal.jsx";
 import { HOME_TOP_CATEGORIES, categoryLabel } from "../lib/constants.js";
-import { buyNowWhatsApp } from "../lib/utils.js";
+import OrderModal from "../components/OrderModal.jsx";
+import OrderSuccessModal from "../components/OrderSuccessModal.jsx";
 
 const PAGE = 16;
 
@@ -19,9 +19,10 @@ export default function Home() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [viewing, setViewing] = useState(null);
+  const [buying, setBuying] = useState(null);
+  const [success, setSuccess] = useState(null);
   const navigate = useNavigate();
   const { add } = useCart();
-  const { whatsappNumber } = useConfig();
 
   useEffect(() => {
     Promise.all([api("/content"), api("/categories"), api("/products?limit=" + PAGE)])
@@ -93,7 +94,7 @@ export default function Home() {
         <div><i className="fas fa-earth-asia" /> All India Delivery</div>
       </div>
 
-      <section className="section">
+      <section className="section" id="shop">
         <div className="section-head">
           <h2>What are you looking for?</h2>
         </div>
@@ -111,7 +112,7 @@ export default function Home() {
                   product={p}
                   onView={setViewing}
                   onAdd={(prod) => add(prod)}
-                  onBuy={(prod) => buyNowWhatsApp(prod, whatsappNumber)}
+                  onBuy={(prod) => setBuying([{ ...prod, qty: 1 }])}
                 />
               ))}
             </div>
@@ -134,10 +135,13 @@ export default function Home() {
           }}
           onBuy={(p) => {
             setViewing(null);
-            buyNowWhatsApp(p, whatsappNumber);
+            setBuying([{ ...p, qty: p.qty || 1 }]);
           }}
         />
       )}
+
+      {buying && <OrderModal items={buying} onClose={() => setBuying(null)} onSuccess={(result) => { setBuying(null); setSuccess(result); }} />}
+      {success && <OrderSuccessModal result={success} onClose={() => setSuccess(null)} />}
 
       {!loading && popup && <PopupModal popup={popup} onClose={() => setContent((c) => ({ ...c, popups: [] }))} />}
 
