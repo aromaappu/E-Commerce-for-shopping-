@@ -10,7 +10,10 @@ process.env.JWT_SECRET = "test-secret-for-automated-tests-only";
 const { app } = await import("../src/index.js");
 
 test("admin API rejects anonymous requests and invalid logins", async () => {
-  const server = app.listen(0, "127.0.0.1");
+  const server = await new Promise((resolve, reject) => {
+    const instance = app.listen(0, "127.0.0.1", () => resolve(instance));
+    instance.once("error", reject);
+  });
   try {
     const base = `http://127.0.0.1:${server.address().port}`;
     for (const [method, url] of [
@@ -31,6 +34,6 @@ test("admin API rejects anonymous requests and invalid logins", async () => {
     const health = await fetch(base + "/api/health");
     assert.equal(health.status, 200);
   } finally {
-    await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+    if (server.listening) await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
   }
 });
