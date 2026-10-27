@@ -96,11 +96,12 @@ export default function OrderModal({ items, onClose, onSuccess }) {
 
   return (
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <form className="modal order-modal" onSubmit={submit}>
+      <form className="modal order-modal" onSubmit={submit} role="dialog" aria-modal="true" aria-labelledby="checkout-heading">
         <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
           &times;
         </button>
-        <h3>Confirm Your Order</h3>
+        <p className="checkout-eyebrow">CHECKOUT · FINAL STEP</p>
+        <h3 id="checkout-heading">Confirm your order</h3>
 
         <div className="om-summary">
           {items.slice(0, 3).map((it) => (
@@ -112,8 +113,10 @@ export default function OrderModal({ items, onClose, onSuccess }) {
           </span>
         </div>
 
-        <label>Your Name *</label>
+        <label htmlFor="customer-name">Your name *</label>
         <input
+          id="customer-name"
+          autoComplete="name"
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           placeholder="Enter your name"
@@ -121,8 +124,10 @@ export default function OrderModal({ items, onClose, onSuccess }) {
         />
         {errors.name && <small className="field-error">{errors.name}</small>}
 
-        <label>WhatsApp Number *</label>
+        <label htmlFor="customer-phone">WhatsApp number *</label>
         <input
+          id="customer-phone"
+          autoComplete="tel"
           value={form.phone}
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
           placeholder="Enter WhatsApp number"
@@ -130,8 +135,10 @@ export default function OrderModal({ items, onClose, onSuccess }) {
         />
         {errors.phone && <small className="field-error">{errors.phone}</small>}
 
-        <label>Delivery Address</label>
+        <label htmlFor="customer-address">Delivery address</label>
         <textarea
+          id="customer-address"
+          autoComplete="street-address"
           rows={2}
           value={form.address}
           onChange={(e) => setForm({ ...form, address: e.target.value })}
