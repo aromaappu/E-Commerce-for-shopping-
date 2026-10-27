@@ -50,31 +50,73 @@ function san(s) { return String(s || "").replace(/<[^>]*>/g, "").trim().slice(0,
 app.get("/api/health", (_, res) => res.json({ ok: true, name: STORE }));
 app.get("/api/config", (_, res) => res.json({ storeName: STORE, whatsappNumber: WA, trackingPrefix: PREFIX }));
 
-app.get("/api/categories", async (_, res) => {
+app.get("/api/categories", async (_req, res) => {
   try {
-    const r = await sb("products", { params: { select: "category", limit: "1000" } });
-    const d = await r.json();
-    const cats = [...new Set((d || []).map(p => p.category).filter(Boolean))].sort();
-    res.json(cats);
-  } catch (e) { res.status(500).json({ error: e.message }); }
+    const response = await sb("products", { params: { select: "category,image_url,out_of_stock", limit: "1000" } });
+    if (!response.ok) throw new Error("Could not load categories");
+    const products = await response.json();
+    if (!Array.isArray(products)) throw new Error("Unexpected category response");
+    const byCategory = new Map();
+    for (const p of products) {
+      if (!p.category) continue;
+      if (!byCategory.has(p.category)) byCategory.set(p.category, { slug: p.category, count: 0, image: "" });
+      const cat = byCategory.get(p.category);
+      cat.count += 1;
+      if (!cat.image && p.image_url) cat.image = p.image_url;
+    }
+    res.json({ categories: [...byCategory.values()] });
+  } catch (e) {
+    console.error("[categories]", e);
+    res.status(503).json({ error: "Categories are temporarily unavailable" });
+  }
 });
 
 app.get("/api/products", async (req, res) => {
   try {
-    const { search, category, limit } = req.query;
-    const q = { select: "*", order: "created_at.desc", limit: String(Math.min(parseInt(limit) || 500, 1000)) };
-    if (category && !search) q.params = { category: `eq.${category}`, order: "created_at.desc", limit: q.limit, select: q.select };
-    const r = await sb("products", { params: q });
-    let data = await r.json();
-    if (search) {
-      const terms = search.toLowerCase().split(/\s+/).filter(Boolean);
-      data = (data || []).filter(p => {
-        const hay = `${p.name || ""} ${p.product_code || ""} ${p.category || ""}`.toLowerCase();
-        return terms.every(t => hay.includes(t));
-      });
+    const response = await sb("products", { params: { select: "*", order: "sort_order.asc", limit: "1000" } });
+    if (!response.ok) throw new Error("Could not load catalogue");
+    const products = await response.json();
+    if (!Array.isArray(products)) throw new Error("Unexpected catalogue response");
+
+    let filtered = products;
+    const category = typeof req.query.category === "string" ? req.query.category : "";
+    if (category && category !== "all") filtered = filtered.filter((p) => p.category === category);
+    const query = String(req.query.q || req.query.search || "").trim().toLowerCase().slice(0, 100);
+    if (query) {
+      const words = query.split(/\s+/).filter(Boolean);
+      const synonyms = {
+        watch: ["analog", "smart", "smc"], watches: ["analog", "smart", "smc"],
+        bag: ["school", "side", "travel"], bags: ["school", "side", "travel"],
+        shoes: ["shoe"], slippers: ["chappal", "crocs"],
+        tshirt: ["tshirt", "tcombo"], earphones: ["airpod", "headphone"]
+      };
+      filtered = filtered.filter((p) => words.every((word) => {
+        const searchable = String([p.name, p.category, p.product_code].join(" ")).toLowerCase();
+        return searchable.includes(word) || (synonyms[word] || []).includes(p.category);
+      }));
     }
-    res.json(data || []);
-  } catch (e) { res.status(500).json({ error: e.message }); }
+    const limit = Math.min(1000, Math.max(1, parseInt(req.query.limit, 10) || 1000));
+    const offset = Math.max(0, parseInt(req.query.offset, 10) || 0);
+    res.json({ products: filtered.slice(offset, offset + limit), total: filtered.length });
+  } catch (e) {
+    console.error("[products]", e);
+    res.status(503).json({ error: "Product catalogue is temporarily unavailable" });
+  }
+});
+
+app.get("/api/products/:code", async (req, res) => {
+  try {
+    const code = String(req.params.code || "").slice(0, 40);
+    const response = await sb("products", { params: { select: "*", product_code: "eq." + code, limit: "1" } });
+    if (!response.ok) throw new Error("Could not load product");
+    const products = await response.json();
+    if (!Array.isArray(products)) throw new Error("Unexpected product response");
+    if (!products[0]) return res.status(404).json({ error: "Product not found" });
+    res.json({ product: products[0] });
+  } catch (e) {
+    console.error("[product]", e);
+    res.status(503).json({ error: "Product details are temporarily unavailable" });
+  }
 });
 
 app.post("/api/orders", async (req, res) => {
