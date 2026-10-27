@@ -18,21 +18,37 @@ export default function Home() {
   const [products, setProducts] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [viewing, setViewing] = useState(null);
   const navigate = useNavigate();
   const { add } = useCart();
   const { whatsappNumber } = useConfig();
 
   useEffect(() => {
-    Promise.all([api("/content"), api("/categories"), api("/products?limit=" + PAGE)])
-      .then(([c, cats, prods]) => {
-        setContent(c);
-        setCategories(cats.categories || []);
-        setProducts(prods.products || []);
-        setTotal(prods.total || 0);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    let active = true;
+    Promise.allSettled([
+      api("/content"),
+      api("/categories"),
+      api("/products?limit=" + PAGE)
+    ]).then(([contentResult, categoryResult, productResult]) => {
+      if (!active) return;
+      if (contentResult.status === "fulfilled") setContent(contentResult.value);
+      if (categoryResult.status === "fulfilled") {
+        const value = categoryResult.value;
+        setCategories(Array.isArray(value.categories) ? value.categories : []);
+      }
+      if (productResult.status === "fulfilled") {
+        const value = productResult.value;
+        setProducts(Array.isArray(value.products) ? value.products : []);
+        setTotal(Number(value.total) || 0);
+        setLoadError("");
+      } else {
+        setLoadError("Products could not load. Please refresh and try again.");
+      }
+    }).finally(() => {
+      if (active) setLoading(false);
+    });
+    return () => { active = false; };
   }, []);
 
   const loadMore = useCallback(async () => {
@@ -40,6 +56,9 @@ export default function Home() {
     try {
       const more = await api(`/products?limit=${PAGE}&offset=${products.length}`);
       setProducts((p) => [...p, ...(more.products || [])]);
+      setLoadError("");
+    } catch {
+      setLoadError("Could not load more products. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -98,6 +117,7 @@ export default function Home() {
           <h2>What are you looking for?</h2>
         </div>
 
+        {loadError && <p className="empty-note error" role="alert">{loadError}</p>}
         {loading && products.length === 0 ? (
           <GridSkeleton count={8} />
         ) : products.length === 0 ? (
