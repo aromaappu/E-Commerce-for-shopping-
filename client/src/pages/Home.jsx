@@ -89,9 +89,9 @@ export default function Home() {
       </section>
 
       <div className="trust-row">
-        <div><i className="fas fa-bolt" /> Fast Delivery</div>
-        <div><i className="fas fa-tags" /> Affordable Price</div>
-        <div><i className="fas fa-earth-asia" /> All India Delivery</div>
+        <div><i className="fas fa-bag-shopping" aria-hidden="true" /> Easy ordering</div>
+        <div><i className="fas fa-comments" aria-hidden="true" /> WhatsApp support</div>
+        <div><i className="fas fa-route" aria-hidden="true" /> Order tracking</div>
       </div>
 
       <section className="section" id="shop">
@@ -165,9 +165,13 @@ function BannerCarousel({ banners }) {
   if (list.length === 0) {
     return (
       <div className="hero-fallback">
-        <h1>New Season. New Styles.</h1>
-        <p>Bags · Shoes · Watches · Fashion — order in seconds via WhatsApp</p>
-        <a href="#shop" className="btn btn-red">Start Shopping</a>
+        <span className="hero-eyebrow">Discover your next favorite</span>
+        <h1>Style for every day.<br /><span>Find it at Trend Mart.</span></h1>
+        <p>Explore fashion, accessories and everyday essentials—all in one place.</p>
+        <div className="hero-actions">
+          <a href="#shop" className="btn btn-red">Shop the collection <i className="fas fa-arrow-right" aria-hidden="true" /></a>
+          <Link to="/sections" className="btn hero-secondary">Explore categories</Link>
+        </div>
       </div>
     );
   }
