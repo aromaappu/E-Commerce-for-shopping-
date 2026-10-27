@@ -52,7 +52,7 @@ export default function OrderModal({ items, onClose, onSuccess }) {
       const total = items.reduce((t, it) => t + parsePrice(it.price) * it.qty, 0);
       const payloadItems = items.map((it) => ({
         id: it.id ?? null,
-        code: it.code,
+        code: it.product_code || it.code,
         name: it.name,
         price: it.price,
         img: typeof it.img === "string" && it.img.startsWith("http") ? it.img : "",
@@ -71,18 +71,20 @@ export default function OrderModal({ items, onClose, onSuccess }) {
       });
 
       const code = res.order?.tracking_code || "";
+      const savedItems = res.order?.items || payloadItems;
+      const savedTotal = Number(res.order?.total ?? total);
       const message = buildOrderMessage({
-        items: payloadItems.map((it) => ({ ...it, desc: "" })),
+        items: savedItems.map((it) => ({ ...it, desc: "" })),
         customer: form,
         trackingCode: code,
-        total
+        total: savedTotal
       });
       openWhatsApp(waNum, message, winRef.current);
 
       onSuccess({
         trackingCode: code,
-        total,
-        firstItem: items[0]
+        total: savedTotal,
+        firstItem: savedItems[0]
       });
     } catch (err) {
       if (winRef.current) winRef.current.close();

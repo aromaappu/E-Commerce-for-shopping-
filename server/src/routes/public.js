@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { supabase } from "../lib/supabase.js";
 import { config } from "../config.js";
+import { parseCheckoutItems, priceCheckoutItems } from "../lib/checkout.js";
 import {
   asyncHandler,
   HttpError,
   sanitize,
-  parsePrice,
   generateTrackingCode,
   rateLimit
 } from "../lib/helpers.js";
@@ -215,9 +215,6 @@ router.get(
       supabase.from("popups").select("*").eq("active", true).order("created_at", { ascending: false })
     ]);
 
-    // fire-and-forget cleanup of expired popups (same behaviour as legacy site)
-    supabase.from("popups").delete().lt("end_date", new Date().toISOString()).then(() => {}, () => {});
-
     const now = Date.now();
     const popups = (popupsRes.data || []).filter((p) => {
       const start = p.start_date ? new Date(p.start_date).getTime() : 0;
@@ -234,63 +231,35 @@ router.get(
 );
 
 /* ---------- POST /api/orders : place an order ---------- */
-router.post(
-  "/orders",
-  rateLimit({ windowMs: 60_000, max: 10 }),
-  asyncHandler(async (req, res) => {
-    const body = req.body || {};
-    const customer_name = sanitize(body.customer_name, 120);
-    const customer_phone = sanitize(body.customer_phone, 20);
-    const customer_address = sanitize(body.customer_address, 400);
+router.post("/orders", rateLimit({ windowMs: 60_000, max: 10 }), asyncHandler(async (req, res) => {
+  const body = req.body || {};
+  const customer_name = sanitize(body.customer_name, 120);
+  const customer_phone = sanitize(body.customer_phone, 20);
+  const customer_address = sanitize(body.customer_address, 400);
+  if (!customer_name) throw new HttpError(400, "Name is required");
+  if (!/^[0-9+\-\s]{10,15}$/.test(customer_phone)) throw new HttpError(400, "Valid phone number required");
 
-    if (!customer_name) throw new HttpError(400, "Name is required");
-    if (!/^[0-9+\-\s]{10,15}$/.test(customer_phone)) {
-      throw new HttpError(400, "A valid phone number is required");
-    }
-    if (!Array.isArray(body.items) || body.items.length === 0) {
-      throw new HttpError(400, "Order must contain at least one item");
-    }
-
-    const items = body.items.slice(0, 50).map((it) => ({
-      id: it.id ?? null,
-      code: sanitize(it.code, 40),
-      name: sanitize(it.name, 200),
-      price: sanitize(it.price, 30),
-      img: String(it.img || "").slice(0, 600),
-      qty: Math.max(1, Math.min(Number(it.qty) || 1, 99))
-    }));
-
-    const total =
-      parsePrice(body.total) ||
-      items.reduce((t, it) => t + parsePrice(it.price) * it.qty, 0);
-
-    const payload = {
-      customer_name,
-      customer_phone,
-      customer_address,
-      items,
-      total,
-      status: "Order Placed",
-      status_history: [{ status: "Order Placed", at: new Date().toISOString() }],
-      order_time: new Date().toISOString(),
-      whatsapp_redirect_time: new Date().toISOString()
-    };
-
-    let lastError = null;
-    for (let attempt = 0; attempt < 5; attempt++) {
-      payload.tracking_code = generateTrackingCode();
-      const { data, error } = await supabase
-        .from("orders")
-        .insert(payload)
-        .select()
-        .single();
-      if (!error) return res.status(201).json({ ok: true, order: data });
-      lastError = error;
-      if (error.code !== "23505") throw new HttpError(500, error.message);
-    }
-    throw new HttpError(500, lastError?.message || "Could not place order");
-  })
-);
+  const requested = parseCheckoutItems(body.items);
+  const { data: catalog, error: productError } = await supabase
+    .from("products")
+    .select("id,product_code,name,price,image_url,out_of_stock")
+    .in("product_code", requested.map((item) => item.code));
+  if (productError) throw new HttpError(500, "Cannot verify current prices");
+  const { items, total } = priceCheckoutItems(requested, catalog);
+  const now = new Date().toISOString();
+  const payload = {
+    customer_name, customer_phone, customer_address, items, total,
+    status: "Order Placed", status_history: [{ status: "Order Placed", at: now }],
+    order_time: now, whatsapp_redirect_time: now
+  };
+  for (let attempt = 0; attempt < 5; attempt++) {
+    payload.tracking_code = generateTrackingCode();
+    const { data, error } = await supabase.from("orders").insert(payload).select().single();
+    if (!error) return res.status(201).json({ ok: true, order: data });
+    if (error.code !== "23505") throw new HttpError(500, "Could not save order");
+  }
+  throw new HttpError(500, "Please retry your order");
+}));
 
 /* ---------- GET /api/orders/track/:code ---------- */
 router.get(
@@ -300,7 +269,7 @@ router.get(
     const code = sanitize(req.params.code, 20).toUpperCase();
     const { data, error } = await supabase
       .from("orders")
-      .select("*")
+      .select("tracking_code,items,total,status,status_history,order_time,created_at")
       .eq("tracking_code", code)
       .maybeSingle();
     if (error) throw new HttpError(500, error.message);
