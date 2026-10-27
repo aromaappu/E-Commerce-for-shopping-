@@ -2,13 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../lib/api.js";
 import { useCart } from "../context/CartContext.jsx";
+import { useConfig } from "../context/ConfigContext.jsx";
 import OfferBar from "../components/OfferBar.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import ProductModal from "../components/ProductModal.jsx";
 import PopupModal from "../components/PopupModal.jsx";
 import { HOME_TOP_CATEGORIES, categoryLabel } from "../lib/constants.js";
-import OrderModal from "../components/OrderModal.jsx";
-import OrderSuccessModal from "../components/OrderSuccessModal.jsx";
+import { buyNowWhatsApp } from "../lib/utils.js";
 
 const PAGE = 16;
 
@@ -19,10 +19,9 @@ export default function Home() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [viewing, setViewing] = useState(null);
-  const [buying, setBuying] = useState(null);
-  const [success, setSuccess] = useState(null);
   const navigate = useNavigate();
   const { add } = useCart();
+  const { whatsappNumber } = useConfig();
 
   useEffect(() => {
     Promise.all([api("/content"), api("/categories"), api("/products?limit=" + PAGE)])
@@ -89,12 +88,12 @@ export default function Home() {
       </section>
 
       <div className="trust-row">
-        <div><i className="fas fa-bag-shopping" aria-hidden="true" /> Easy ordering</div>
-        <div><i className="fas fa-comments" aria-hidden="true" /> WhatsApp support</div>
-        <div><i className="fas fa-route" aria-hidden="true" /> Order tracking</div>
+        <div><i className="fas fa-bolt" /> Fast Delivery</div>
+        <div><i className="fas fa-tags" /> Affordable Price</div>
+        <div><i className="fas fa-earth-asia" /> All India Delivery</div>
       </div>
 
-      <section className="section" id="shop">
+      <section className="section">
         <div className="section-head">
           <h2>What are you looking for?</h2>
         </div>
@@ -112,7 +111,7 @@ export default function Home() {
                   product={p}
                   onView={setViewing}
                   onAdd={(prod) => add(prod)}
-                  onBuy={(prod) => setBuying([{ ...prod, qty: 1 }])}
+                  onBuy={(prod) => buyNowWhatsApp(prod, whatsappNumber)}
                 />
               ))}
             </div>
@@ -135,13 +134,10 @@ export default function Home() {
           }}
           onBuy={(p) => {
             setViewing(null);
-            setBuying([{ ...p, qty: p.qty || 1 }]);
+            buyNowWhatsApp(p, whatsappNumber);
           }}
         />
       )}
-
-      {buying && <OrderModal items={buying} onClose={() => setBuying(null)} onSuccess={(result) => { setBuying(null); setSuccess(result); }} />}
-      {success && <OrderSuccessModal result={success} onClose={() => setSuccess(null)} />}
 
       {!loading && popup && <PopupModal popup={popup} onClose={() => setContent((c) => ({ ...c, popups: [] }))} />}
 
@@ -165,13 +161,9 @@ function BannerCarousel({ banners }) {
   if (list.length === 0) {
     return (
       <div className="hero-fallback">
-        <span className="hero-eyebrow">Discover your next favorite</span>
-        <h1>Style for every day.<br /><span>Find it at Trend Mart.</span></h1>
-        <p>Explore fashion, accessories and everyday essentials—all in one place.</p>
-        <div className="hero-actions">
-          <a href="#shop" className="btn btn-red">Shop the collection <i className="fas fa-arrow-right" aria-hidden="true" /></a>
-          <Link to="/sections" className="btn hero-secondary">Explore categories</Link>
-        </div>
+        <h1>New Season. New Styles.</h1>
+        <p>Bags · Shoes · Watches · Fashion — order in seconds via WhatsApp</p>
+        <a href="#shop" className="btn btn-red">Start Shopping</a>
       </div>
     );
   }

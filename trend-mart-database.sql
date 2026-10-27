@@ -10,8 +10,8 @@
 --      and fill the products table
 --
 -- Safe to re-run: every statement is idempotent.
--- The current app uses the server-side service key, so the RLS
--- policies below deny anonymous access.
+-- The app uses the anon key for all reads/writes, so the RLS
+-- policies below allow anon access (no auth users are used).
 -- ============================================================
 
 -- ============================================================
@@ -107,39 +107,59 @@ create table if not exists public.offers (
 );
 
 -- ============================================================
--- 3. ROW LEVEL SECURITY: only service_role may read/write
+-- 3. ROW LEVEL SECURITY
 -- ============================================================
+-- The site + admin panel use the Supabase anon key (no auth
+-- sign-in), so these policies let anon read and write directly.
+-- Recreate policies so re-running this file never duplicates.
+-- ------------------------------------------------------------
+
 alter table public.products enable row level security;
-alter table public.orders enable row level security;
-alter table public.banners enable row level security;
-alter table public.popups enable row level security;
-alter table public.offers enable row level security;
-
 drop policy if exists "anon all products" on public.products;
+create policy "anon all products" on public.products
+    for all using (true) with check (true);
+
+alter table public.orders enable row level security;
 drop policy if exists "anon all orders" on public.orders;
+create policy "anon all orders" on public.orders
+    for all using (true) with check (true);
+
+alter table public.banners enable row level security;
 drop policy if exists "anon all banners" on public.banners;
+create policy "anon all banners" on public.banners
+    for all using (true) with check (true);
+
+alter table public.popups enable row level security;
 drop policy if exists "anon all popups" on public.popups;
+create policy "anon all popups" on public.popups
+    for all using (true) with check (true);
+
+alter table public.offers enable row level security;
 drop policy if exists "anon all offers" on public.offers;
+create policy "anon all offers" on public.offers
+    for all using (true) with check (true);
 
-revoke all on public.products from anon, authenticated;
-revoke all on public.orders from anon, authenticated;
-revoke all on public.banners from anon, authenticated;
-revoke all on public.popups from anon, authenticated;
-revoke all on public.offers from anon, authenticated;
-
+-- ------------------------------------------------------------
+-- chat_sessions : optional history of support chat conversations
+-- ------------------------------------------------------------
 create table if not exists public.chat_sessions (
-  id uuid primary key default gen_random_uuid(),
-  session_id text not null unique,
-  messages jsonb not null default '[]'::jsonb,
-  state jsonb not null default '{}'::jsonb,
-  last_at timestamptz not null default now(),
-  created_at timestamptz not null default now()
+    id          uuid primary key default gen_random_uuid(),
+    session_id  text not null unique,
+    messages    jsonb not null default '[]'::jsonb,
+    state       jsonb not null default '{}'::jsonb,
+    last_at     timestamptz not null default now(),
+    created_at  timestamptz not null default now()
 );
+
+-- Safe re-run: add the column if it predates this version.
 alter table public.chat_sessions add column if not exists state jsonb not null default '{}'::jsonb;
+
 alter table public.chat_sessions enable row level security;
 drop policy if exists "anon all chat_sessions" on public.chat_sessions;
-revoke all on public.chat_sessions from anon, authenticated;
+create policy "anon all chat_sessions" on public.chat_sessions
+    for all using (true) with check (true);
 
+-- ============================================================
 -- 4. TRACKING RPC
 -- ------------------------------------------------------------
 -- get_order_by_code(tracking_code) -> single order row
@@ -157,22 +177,41 @@ as $$
     limit 1;
 $$;
 
-revoke execute on function public.get_order_by_code(text) from public, anon, authenticated;
-grant execute on function public.get_order_by_code(text) to service_role;
+grant execute on function public.get_order_by_code(text) to anon, authenticated, service_role;
 
 -- ============================================================
--- 5. STORAGE: public image reads; upload only through the server
+-- 5. STORAGE (product-images bucket)
+-- ------------------------------------------------------------
+-- Public bucket for product / banner / popup images. Uploads
+-- are allowed for anon so the admin panel can save images.
 -- ============================================================
 insert into storage.buckets (id, name, public)
 values ('product-images', 'product-images', true)
-on conflict (id) do update set public = true;
+on conflict (id) do nothing;
+
 drop policy if exists "anon upload product-images" on storage.objects;
+create policy "anon upload product-images" on storage.objects
+    for insert to anon, authenticated, service_role
+    with check (bucket_id = 'product-images');
+
 drop policy if exists "anon update product-images" on storage.objects;
+create policy "anon update product-images" on storage.objects
+    for update to anon, authenticated, service_role
+    using (bucket_id = 'product-images') with check (bucket_id = 'product-images');
+
 drop policy if exists "anon delete product-images" on storage.objects;
+create policy "anon delete product-images" on storage.objects
+    for delete to anon, authenticated, service_role
+    using (bucket_id = 'product-images');
+
+-- Public bucket policy: objects are already served publicly because
+-- the bucket is public; keep reads open to all roles as well.
 drop policy if exists "public read product-images" on storage.objects;
 create policy "public read product-images" on storage.objects
-  for select using (bucket_id = 'product-images');
+    for select to anon, authenticated, service_role
+    using (bucket_id = 'product-images');
 
+-- ============================================================
 -- 6. OPTIONAL SEED DATA
 -- ------------------------------------------------------------
 -- A sample offer bar entry. Delete this block if you do not

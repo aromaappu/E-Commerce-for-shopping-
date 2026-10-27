@@ -10,7 +10,7 @@ import { buildOrderMessage, openWhatsApp, parsePrice } from "../lib/utils.js";
  */
 export default function OrderModal({ items, onClose, onSuccess }) {
   const { whatsappNumber } = useConfig();
-  const waNum = String(whatsappNumber || "").replace(/\D/g, "");
+  const waNum = whatsappNumber || "9188384350";
   const { showToast } = useCart();
   const [form, setForm] = useState({ name: "", phone: "", address: "" });
   const [errors, setErrors] = useState({});
@@ -38,7 +38,6 @@ export default function OrderModal({ items, onClose, onSuccess }) {
     if (!form.name.trim()) e.name = "Please enter your name";
     if (!/^[0-9+\-\s]{10,15}$/.test(form.phone.trim()))
       e.phone = "Enter a valid WhatsApp number";
-    if (!/^\d{10,15}$/.test(waNum)) e.general = "The store WhatsApp number is not configured.";
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -53,7 +52,7 @@ export default function OrderModal({ items, onClose, onSuccess }) {
       const total = items.reduce((t, it) => t + parsePrice(it.price) * it.qty, 0);
       const payloadItems = items.map((it) => ({
         id: it.id ?? null,
-        code: it.product_code || it.code,
+        code: it.code,
         name: it.name,
         price: it.price,
         img: typeof it.img === "string" && it.img.startsWith("http") ? it.img : "",
@@ -72,20 +71,18 @@ export default function OrderModal({ items, onClose, onSuccess }) {
       });
 
       const code = res.order?.tracking_code || "";
-      const savedItems = res.order?.items || payloadItems;
-      const savedTotal = Number(res.order?.total ?? total);
       const message = buildOrderMessage({
-        items: savedItems.map((it) => ({ ...it, desc: "" })),
+        items: payloadItems.map((it) => ({ ...it, desc: "" })),
         customer: form,
         trackingCode: code,
-        total: savedTotal
+        total
       });
       openWhatsApp(waNum, message, winRef.current);
 
       onSuccess({
         trackingCode: code,
-        total: savedTotal,
-        firstItem: savedItems[0]
+        total,
+        firstItem: items[0]
       });
     } catch (err) {
       if (winRef.current) winRef.current.close();
@@ -96,12 +93,11 @@ export default function OrderModal({ items, onClose, onSuccess }) {
 
   return (
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <form className="modal order-modal" onSubmit={submit} role="dialog" aria-modal="true" aria-labelledby="checkout-heading">
+      <form className="modal order-modal" onSubmit={submit}>
         <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
           &times;
         </button>
-        <p className="checkout-eyebrow">CHECKOUT · FINAL STEP</p>
-        <h3 id="checkout-heading">Confirm your order</h3>
+        <h3>Confirm Your Order</h3>
 
         <div className="om-summary">
           {items.slice(0, 3).map((it) => (
@@ -113,10 +109,8 @@ export default function OrderModal({ items, onClose, onSuccess }) {
           </span>
         </div>
 
-        <label htmlFor="customer-name">Your name *</label>
+        <label>Your Name *</label>
         <input
-          id="customer-name"
-          autoComplete="name"
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           placeholder="Enter your name"
@@ -124,10 +118,8 @@ export default function OrderModal({ items, onClose, onSuccess }) {
         />
         {errors.name && <small className="field-error">{errors.name}</small>}
 
-        <label htmlFor="customer-phone">WhatsApp number *</label>
+        <label>WhatsApp Number *</label>
         <input
-          id="customer-phone"
-          autoComplete="tel"
           value={form.phone}
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
           placeholder="Enter WhatsApp number"
@@ -135,17 +127,14 @@ export default function OrderModal({ items, onClose, onSuccess }) {
         />
         {errors.phone && <small className="field-error">{errors.phone}</small>}
 
-        <label htmlFor="customer-address">Delivery address</label>
+        <label>Delivery Address</label>
         <textarea
-          id="customer-address"
-          autoComplete="street-address"
           rows={2}
           value={form.address}
           onChange={(e) => setForm({ ...form, address: e.target.value })}
           placeholder="House / street / city (optional)"
         />
 
-        {errors.general && <p className="field-error">{errors.general}</p>}
         <button className="btn btn-whatsapp btn-lg btn-block" disabled={busy}>
           {busy ? (
             <>
@@ -157,7 +146,7 @@ export default function OrderModal({ items, onClose, onSuccess }) {
             </>
           )}
         </button>
-        <p className="om-note">Your tracking code is created first. Send the WhatsApp message to confirm details with the seller.</p>
+        <p className="om-note">Your order is confirmed after you send the WhatsApp message.</p>
       </form>
     </div>
   );
