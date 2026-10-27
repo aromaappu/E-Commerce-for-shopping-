@@ -9,13 +9,7 @@ function readStored() {
     const arr = JSON.parse(localStorage.getItem(KEY) || "[]");
     if (!Array.isArray(arr)) return [];
     const now = Date.now();
-    return arr.filter((item) => now - (item.addedAt || now) < TTL)
-      .map((item) => ({
-        ...item,
-        code: String(item.product_code || item.code || "").replace(/_\d{13}$/, ""),
-        qty: Math.max(1, Math.min(Number(item.qty) || 1, 99))
-      }))
-      .filter((item) => item.code);
+    return arr.filter((i) => now - (i.addedAt || now) < TTL);
   } catch {
     return [];
   }
@@ -27,79 +21,74 @@ export function CartProvider({ children }) {
   const toastTimer = useRef(null);
 
   useEffect(() => {
-    try { localStorage.setItem(KEY, JSON.stringify(items)); } catch { /* private mode */ }
+    localStorage.setItem(KEY, JSON.stringify(items));
   }, [items]);
 
-  // Reconcile saved carts with current products, including older temporary cart IDs.
   useEffect(() => {
-    if (!items.length) return;
-    let active = true;
+    const missing = items.filter((i) => !i.img && i.code);
+    if (missing.length === 0) return;
     fetch("/api/products?limit=1000")
-      .then((response) => {
-        if (!response.ok) throw new Error("Cannot load catalogue");
-        return response.json();
-      })
-      .then((data) => {
-        if (!active) return;
-        const products = data.products || [];
-        const byId = new Map(products.map((p) => [String(p.id), p]));
-        const byCode = new Map(products.map((p) => [p.product_code, p]));
-        setItems((prev) => {
-          const merged = new Map();
-          for (const item of prev) {
-            const product = byId.get(String(item.id)) || byCode.get(item.code);
-            const code = product?.product_code || item.code;
-            const updated = product ? {
-              ...item, code, name: product.name, price: product.price,
-              img: product.image_url || "", image_url: product.image_url || ""
-            } : item;
-            const existing = merged.get(code);
-            merged.set(code, existing ? { ...existing, qty: Math.min(existing.qty + updated.qty, 99) } : updated);
-          }
-          return [...merged.values()];
-        });
+      .then((r) => r.json())
+      .then((all) => {
+        const products = all.products || all || [];
+        const map = {};
+        products.forEach((p) => { map[p.product_code || p.code] = p; });
+        setItems((prev) =>
+          prev.map((i) => {
+            if (i.img || !map[i.code]) return i;
+            const p = map[i.code];
+            return { ...i, img: p.image_url || "", image_url: p.image_url || "" };
+          })
+        );
       })
       .catch(() => {});
-    return () => { active = false; };
   }, []);
 
-  const showToast = useCallback((message) => {
-    setToast(message);
+  const showToast = useCallback((msg) => {
+    setToast(msg);
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(null), 2200);
   }, []);
 
-  const add = useCallback((product, qty = 1) => {
-    const code = product.product_code || product.code;
-    if (!code) {
-      showToast("This product is currently unavailable");
-      return;
-    }
-    const quantity = Math.max(1, Math.min(Number(qty) || 1, 99));
-    setItems((prev) => {
-      const matching = prev.find((item) => item.code === code || (product.id && item.id === product.id));
-      if (matching) return prev.map((item) => item === matching
-        ? { ...item, code, qty: Math.min(item.qty + quantity, 99) }
-        : item
-      );
-      return [...prev, {
-        id: product.id, code, name: product.name, price: product.price,
-        img: product.image_url || product.img || "",
-        image_url: product.image_url || product.img || "",
-        desc: product.description || product.desc || "",
-        qty: quantity, addedAt: Date.now()
-      }];
-    });
-    showToast(`${product.name} added to cart`);
-  }, [showToast]);
+  const add = useCallback(
+    (product, qty = 1) => {
+      setItems((prev) => {
+        return [
+          ...prev,
+          {
+            id: product.id,
+            code: product.code + "_" + Date.now(),
+            name: product.name,
+            price: product.price,
+            img: product.image_url || product.img || "",
+            image_url: product.image_url || product.img || "",
+            desc: product.desc,
+            qty,
+            addedAt: Date.now()
+          }
+        ];
+      });
+      showToast(`${product.name} added to cart`);
+    },
+    [showToast]
+  );
 
-  const remove = useCallback((code) => setItems((prev) => prev.filter((i) => i.code !== code)), []);
-  const setQty = useCallback((code, qty) => setItems((prev) => prev.map((item) =>
-    item.code === code ? { ...item, qty: Math.max(1, Math.min(Number(qty) || 1, 99)) } : item
-  )), []);
+  const remove = useCallback((code) => {
+    setItems((prev) => prev.filter((i) => i.code !== code));
+  }, []);
+
+  const setQty = useCallback((code, qty) => {
+    setItems((prev) =>
+      prev.map((i) =>
+        i.code === code ? { ...i, qty: Math.max(1, Math.min(Number(qty) || 1, 99)) } : i
+      )
+    );
+  }, []);
+
   const clear = useCallback(() => setItems([]), []);
 
-  const count = items.reduce((n, item) => n + item.qty, 0);
+  const count = items.reduce((n, i) => n + i.qty, 0);
+
   return (
     <CartContext.Provider value={{ items, add, remove, setQty, clear, count, showToast }}>
       {children}
