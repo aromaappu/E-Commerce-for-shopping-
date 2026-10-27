@@ -44,3 +44,6 @@ drop policy if exists "public read product-images" on storage.objects;
 create policy "public read product-images"
     on storage.objects for select
     using (bucket_id = 'product-images');
+
+revoke execute on function public.get_order_by_code(text) from public, anon, authenticated;
+grant execute on function public.get_order_by_code(text) to service_role;

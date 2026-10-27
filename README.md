@@ -134,6 +134,13 @@ npm run build && npm start   # Express serves the built SPA on one port
 
 ---
 
+## Production security checklist
+
+- Set SUPABASE_URL, SUPABASE_SERVICE_KEY, ADMIN_EMAIL, ADMIN_PASSWORD, and a strong JWT_SECRET in your server deployment settings.
+- For existing databases run `server/sql/harden-rls.sql` in Supabase SQL Editor to disable legacy anonymous access.
+- Vercel uses the secured Express API; verify admin authentication and test an order after deployment.
+- Local TLS keys were deleted from the current tree, **not from Git history**. Rotate any keys used outside local development.
+
 ## 🔒 Security Model
 
 1. Browsers never see the Supabase service key — it exists only in `server/.env`
