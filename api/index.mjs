@@ -55,9 +55,19 @@ async function sb(table, opts = {}) {
   };
 
   const response = await requestWithKey(firstKey);
-  // If RLS has restricted anonymous reads, use the server key only on the server.
-  if (publicRead && !response.ok && [401, 403].includes(response.status) && SB_KEY && SB_KEY !== firstKey) {
-    return requestWithKey(SB_KEY);
+  // Restricted RLS can return 200 with zero visible rows rather than 401.
+  // Fall back to the server key when available, without ever exposing it to the client.
+  if (publicRead && SB_KEY && SB_KEY !== firstKey) {
+    if (!response.ok && [401, 403].includes(response.status)) {
+      return requestWithKey(SB_KEY);
+    }
+    if (response.ok) {
+      const publicRows = await response.clone().json().catch(() => null);
+      if (Array.isArray(publicRows) && publicRows.length === 0) {
+        const privileged = await requestWithKey(SB_KEY);
+        if (privileged.ok) return privileged;
+      }
+    }
   }
   return response;
 }
