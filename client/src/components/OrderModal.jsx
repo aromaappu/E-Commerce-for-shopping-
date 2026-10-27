@@ -10,7 +10,7 @@ import { buildOrderMessage, openWhatsApp, parsePrice } from "../lib/utils.js";
  */
 export default function OrderModal({ items, onClose, onSuccess }) {
   const { whatsappNumber } = useConfig();
-  const waNum = whatsappNumber || "9188384350";
+  const waNum = String(whatsappNumber || "").replace(/\D/g, "");
   const { showToast } = useCart();
   const [form, setForm] = useState({ name: "", phone: "", address: "" });
   const [errors, setErrors] = useState({});
@@ -38,6 +38,7 @@ export default function OrderModal({ items, onClose, onSuccess }) {
     if (!form.name.trim()) e.name = "Please enter your name";
     if (!/^[0-9+\-\s]{10,15}$/.test(form.phone.trim()))
       e.phone = "Enter a valid WhatsApp number";
+    if (!/^\d{10,15}$/.test(waNum)) e.general = "The store WhatsApp number is not configured.";
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -137,6 +138,7 @@ export default function OrderModal({ items, onClose, onSuccess }) {
           placeholder="House / street / city (optional)"
         />
 
+        {errors.general && <p className="field-error">{errors.general}</p>}
         <button className="btn btn-whatsapp btn-lg btn-block" disabled={busy}>
           {busy ? (
             <>
@@ -148,7 +150,7 @@ export default function OrderModal({ items, onClose, onSuccess }) {
             </>
           )}
         </button>
-        <p className="om-note">Your order is confirmed after you send the WhatsApp message.</p>
+        <p className="om-note">Your tracking code is created first. Send the WhatsApp message to confirm details with the seller.</p>
       </form>
     </div>
   );

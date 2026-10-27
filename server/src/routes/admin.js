@@ -212,7 +212,7 @@ router.put(
   "/orders/:id/status",
   asyncHandler(async (req, res) => {
     const status = sanitize(req.body?.status, 40);
-    if (!status) throw new HttpError(400, "Status is required");
+    if (!ORDER_STATUSES.includes(status)) throw new HttpError(400, "Invalid order status");
 
     const { data: existing, error: fetchErr } = await supabase
       .from("orders")
