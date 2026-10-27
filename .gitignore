@@ -22,3 +22,7 @@ node_modules/
 Thumbs.db
 .vercel
 .env*
+
+# Local certificates and private keys
+*.pem
+*.key
