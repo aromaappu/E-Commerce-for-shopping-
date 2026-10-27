@@ -16,8 +16,10 @@ app.use((req, res, next) => {
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
-const SB_URL = process.env.SUPABASE_URL;
-const SB_KEY = process.env.SUPABASE_SERVICE_KEY;
+const SB_URL = process.env.SUPABASE_URL || "https://ycezesfuypzgdmpamooh.supabase.co";
+const SB_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY || "";
+// Publishable key is intentionally public. Supabase RLS still controls which rows are readable.
+const PUBLIC_KEY = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || "sb_publishable_X8XTU-_ICnmTpI18sJWZzQ_hqN6OnqY";
 const STORE = process.env.STORE_NAME || "Trend Mart";
 const WA = process.env.WHATSAPP_NUMBER || "9188384350";
 const PREFIX = process.env.TRACKING_PREFIX || "TM";
@@ -27,14 +29,37 @@ const JWT_SEC = process.env.JWT_SECRET;
 const JWT_EXP = parseInt(process.env.JWT_EXPIRES_IN) || 7;
 const CHAT_URL = process.env.CHAT_FUNCTION_URL;
 
-function sb(table, opts = {}) {
-  const url = new URL(`/rest/v1/${table}`, SB_URL);
-  Object.entries(opts.params || {}).forEach(([k, v]) => url.searchParams.set(k, v));
-  return fetch(url, {
-    method: opts.method || "GET",
-    headers: { apikey: SB_KEY, Authorization: `Bearer ${opts.auth || SB_KEY}`, "Content-Type": "application/json", Prefer: opts.prefer || "return=representation" },
-    body: opts.body ? JSON.stringify(opts.body) : undefined,
-  });
+async function sb(table, opts = {}) {
+  const method = (opts.method || "GET").toUpperCase();
+  const publicRead = method === "GET";
+  const firstKey = publicRead ? (PUBLIC_KEY || SB_KEY) : SB_KEY;
+  if (!firstKey) throw new Error("Supabase server key is not configured");
+
+  const url = new URL("/rest/v1/" + table, SB_URL);
+  Object.entries(opts.params || {}).forEach(([k, v]) => url.searchParams.set(k, String(v)));
+
+  const requestWithKey = (key) => {
+    // Supabase's sb_publishable_/sb_secret_ keys are API keys, NOT JWTs.
+    // Sending them as Authorization Bearer causes "Invalid JWT" responses.
+    const headers = {
+      apikey: key,
+      "Content-Type": "application/json",
+      Prefer: opts.prefer || "return=representation"
+    };
+    if (!key.startsWith("sb_")) headers.Authorization = "Bearer " + key;
+    return fetch(url, {
+      method,
+      headers,
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    });
+  };
+
+  const response = await requestWithKey(firstKey);
+  // If RLS has restricted anonymous reads, use the server key only on the server.
+  if (publicRead && !response.ok && [401, 403].includes(response.status) && SB_KEY && SB_KEY !== firstKey) {
+    return requestWithKey(SB_KEY);
+  }
+  return response;
 }
 
 function timingEq(a, b) {
