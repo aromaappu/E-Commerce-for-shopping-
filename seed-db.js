@@ -5,8 +5,8 @@
 // inserts every product into the products table.
 //
 // Usage:
-//   1. Make sure Index/shared/config.js has your Supabase URL +
-//      anon + service_role keys and ENABLE_DB: true
+//   1. Set SUPABASE_URL, SUPABASE_ANON_KEY and SUPABASE_SERVICE_KEY in your
+//      environment (never commit the service_role key).
 //   2. Run the SQL in trend-mart-database.sql in the SQL Editor
 //   3. node seed-db.js
 // (Requires Node.js 18+)
@@ -45,9 +45,9 @@ function getConfig() {
         return m ? m[1] : '';
     };
     return {
-        url: grab('SUPABASE_URL'),
-        anon: grab('SUPABASE_ANON_KEY'),
-        service: grab('SUPABASE_SERVICE_KEY')
+        url: process.env.SUPABASE_URL || grab('SUPABASE_URL'),
+        anon: process.env.SUPABASE_ANON_KEY || grab('SUPABASE_ANON_KEY'),
+        service: process.env.SUPABASE_SERVICE_KEY || ''
     };
 }
 

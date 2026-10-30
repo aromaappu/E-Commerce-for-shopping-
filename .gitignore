@@ -22,3 +22,7 @@ node_modules/
 Thumbs.db
 .vercel
 .env*
+
+# Local TLS certs
+client/cert.pem
+client/key.pem

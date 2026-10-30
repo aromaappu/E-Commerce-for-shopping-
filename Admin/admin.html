@@ -288,8 +288,9 @@
         <div class="login-logo"><i class="fas fa-store"></i></div>
         <h1>Trend Mart</h1>
         <div class="login-sub">Admin Panel — manage orders, products &amp; banners</div>
-        <div class="err" id="login-err">Wrong password</div>
-        <input type="password" id="pass" placeholder="Admin password" onkeydown="if(event.key==='Enter')doLogin()">
+        <div class="err" id="login-err">Wrong email or password</div>
+        <input type="email" id="email" placeholder="Admin email" autocomplete="username">
+        <input type="password" id="pass" placeholder="Admin password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
         <button onclick="doLogin()">Sign in <i class="fas fa-arrow-right" style="margin-left:6px;"></i></button>
     </div>
 
@@ -551,8 +552,6 @@
         const CFG = window.TM_CONFIG || {};
         const SUPABASE_URL = CFG.SUPABASE_URL || '';
         const SUPABASE_ANON_KEY = CFG.SUPABASE_ANON_KEY || '';
-        const SUPABASE_SERVICE_KEY = CFG.SUPABASE_SERVICE_KEY || '';
-        const ADMIN_PASSWORD = CFG.ADMIN_PASSWORD || 'CHANGE_ME';
         const DB_ENABLED = !!CFG.ENABLE_DB;
         const BUCKET = 'product-images';
 
@@ -578,17 +577,30 @@
             });
         }
 
-        function doLogin() {
-            const v = document.getElementById('pass').value;
-            if (v === ADMIN_PASSWORD) {
-                try { sessionStorage.setItem('tm_admin', '1'); } catch (e) {}
+        async function doLogin() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('pass').value;
+            const err = document.getElementById('login-err');
+            err.style.display = 'none';
+            try {
+                const res = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, password: password })
+                });
+                if (!res.ok) { err.style.display = 'block'; return; }
+                const data = await res.json();
+                if (!data.token) { err.style.display = 'block'; return; }
+                try { sessionStorage.setItem('tm_admin', '1'); sessionStorage.setItem('tm_admin_token', data.token); } catch (e) {}
+                document.getElementById('pass').value = '';
                 enterApp();
-            } else {
-                document.getElementById('login-err').style.display = 'block';
+            } catch (e) {
+                err.textContent = 'Login service unavailable';
+                err.style.display = 'block';
             }
         }
         function doLogout() {
-            try { sessionStorage.removeItem('tm_admin'); } catch (e) {}
+            try { sessionStorage.removeItem('tm_admin'); sessionStorage.removeItem('tm_admin_token'); } catch (e) {}
             document.getElementById('app').style.display = 'none';
             document.getElementById('login').style.display = 'block';
             document.getElementById('pass').value = '';
