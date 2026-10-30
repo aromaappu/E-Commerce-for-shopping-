@@ -17,7 +17,7 @@ app.use((req, res, next) => {
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
 const SB_URL = process.env.SUPABASE_URL || "https://ycezesfuypzgdmpamooh.supabase.co";
-const SB_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY || "";
+const SB_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
 // Publishable key is intentionally public. Supabase RLS still controls which rows are readable.
 const PUBLIC_KEY = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || "sb_publishable_X8XTU-_ICnmTpI18sJWZzQ_hqN6OnqY";
 const STORE = process.env.STORE_NAME || "Trend Mart";
